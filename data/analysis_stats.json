@@ -1,0 +1,19 @@
+{
+  "public_mean_sentiment": -0.06948109090909091,
+  "media_mean_sentiment": 0.03267174999999999,
+  "t_statistic": -3.7680068480636892,
+  "p_value": 0.00017093681742983964,
+  "cosine_similarity": 0.3329133871568656,
+  "public_n": 1100,
+  "media_n": 400,
+  "public_sentiment_dist": {
+    "negative": 478,
+    "positive": 372,
+    "neutral": 250
+  },
+  "media_sentiment_dist": {
+    "positive": 212,
+    "negative": 142,
+    "neutral": 46
+  }
+}

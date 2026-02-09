@@ -1,0 +1,301 @@
+id,source,drug,text,rating,date,condition
+webmd_0,webmd,Wegovy,Excellent medication. Wegovy helped me lose 44 pounds and my blood sugar is now under control. Worth every penny.,5,2024-02-20,Weight Loss
+webmd_1,webmd,Ozempic,I have been taking Ozempic for 2 months for weight management. I have lost 36 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-11-15,Obesity
+webmd_2,webmd,Ozempic,Ozempic gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,1,2024-08-03,Weight Loss
+webmd_3,webmd,Ozempic,Ozempic gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,2,2024-08-28,Weight Loss
+webmd_4,webmd,Wegovy,Some weight loss on Wegovy but plateaued after 7 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-11-26,Obesity
+webmd_5,webmd,Wegovy,"After struggling with obesity for years, Wegovy finally helped me lose weight. Down 23 lbs in 9 months. Some nausea initially but it passed.",4,2024-05-17,Obesity
+webmd_6,webmd,Wegovy,Excellent medication. Wegovy helped me lose 31 pounds and my blood sugar is now under control. Worth every penny.,4,2024-01-17,Weight Loss
+webmd_7,webmd,Ozempic,"After struggling with obesity for years, Ozempic finally helped me lose weight. Down 15 lbs in 6 months. Some nausea initially but it passed.",5,2024-10-19,Type 2 Diabetes
+webmd_8,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,1,2024-07-20,Weight Loss
+webmd_9,webmd,Wegovy,Excellent medication. Wegovy helped me lose 25 pounds and my blood sugar is now under control. Worth every penny.,4,2024-09-21,Weight Loss
+webmd_10,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 41 lbs. The once-weekly injection is very convenient.,4,2024-07-19,Obesity
+webmd_11,webmd,Wegovy,Wegovy works for weight loss (18 lbs in 6 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-02-17,Weight Loss
+webmd_12,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 44 lbs.,4,2024-12-28,Obesity
+webmd_13,webmd,Ozempic,"Terrible experience with Ozempic. Constant nausea, vomiting, and diarrhea. Had to discontinue after 8 months.",1,2024-11-19,Type 2 Diabetes
+webmd_14,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 39 lbs. The once-weekly injection is very convenient.,5,2024-05-05,Obesity
+webmd_15,webmd,Wegovy,"Terrible experience with Wegovy. Constant nausea, vomiting, and diarrhea. Had to discontinue after 2 months.",2,2024-11-17,Weight Loss
+webmd_16,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 14 lbs.,4,2024-05-24,Type 2 Diabetes
+webmd_17,webmd,Ozempic,Excellent medication. Ozempic helped me lose 30 pounds and my blood sugar is now under control. Worth every penny.,5,2024-02-21,Type 2 Diabetes
+webmd_18,webmd,Ozempic,Excellent medication. Ozempic helped me lose 48 pounds and my blood sugar is now under control. Worth every penny.,4,2024-08-02,Type 2 Diabetes
+webmd_19,webmd,Wegovy,Cannot afford Wegovy. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,1,2024-01-06,Weight Loss
+webmd_20,webmd,Ozempic,"After struggling with obesity for years, Ozempic finally helped me lose weight. Down 44 lbs in 8 months. Some nausea initially but it passed.",5,2024-11-03,Obesity
+webmd_21,webmd,Ozempic,"After struggling with obesity for years, Ozempic finally helped me lose weight. Down 43 lbs in 4 months. Some nausea initially but it passed.",4,2024-01-16,Obesity
+webmd_22,webmd,Ozempic,Ozempic caused severe stomach pain and I ended up in the ER. Would not recommend.,1,2024-04-21,Weight Loss
+webmd_23,webmd,Wegovy,I have been taking Wegovy for 5 months for weight management. I have lost 22 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-09-03,Weight Loss
+webmd_24,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 52 lbs.,5,2024-09-10,Type 2 Diabetes
+webmd_25,webmd,Wegovy,Some weight loss on Wegovy but plateaued after 3 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-12-17,Obesity
+webmd_26,webmd,Wegovy,Wegovy works for weight loss (55 lbs in 10 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-10-27,Type 2 Diabetes
+webmd_27,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-11-01,Obesity
+webmd_28,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 43 lbs though so trying to push through.,3,2024-07-15,Type 2 Diabetes
+webmd_29,webmd,Ozempic,"Lost some weight on Ozempic but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",1,2024-01-18,Obesity
+webmd_30,webmd,Wegovy,"Lost some weight on Wegovy but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",2,2024-02-28,Weight Loss
+webmd_31,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 9 lbs. The once-weekly injection is very convenient.,5,2024-04-20,Obesity
+webmd_32,webmd,Wegovy,"After struggling with obesity for years, Wegovy finally helped me lose weight. Down 25 lbs in 1 months. Some nausea initially but it passed.",4,2024-12-18,Weight Loss
+webmd_33,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 40 lbs.,5,2024-02-03,Type 2 Diabetes
+webmd_34,webmd,Wegovy,Wegovy gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,1,2024-05-22,Obesity
+webmd_35,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-06-12,Weight Loss
+webmd_36,webmd,Ozempic,Excellent medication. Ozempic helped me lose 22 pounds and my blood sugar is now under control. Worth every penny.,5,2024-08-03,Weight Loss
+webmd_37,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 29 lbs.,5,2024-05-01,Obesity
+webmd_38,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 23 lbs.,4,2024-03-08,Type 2 Diabetes
+webmd_39,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 26 lbs though so trying to push through.,3,2024-11-26,Weight Loss
+webmd_40,webmd,Ozempic,Excellent medication. Ozempic helped me lose 25 pounds and my blood sugar is now under control. Worth every penny.,5,2024-06-26,Type 2 Diabetes
+webmd_41,webmd,Ozempic,"Lost some weight on Ozempic but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",2,2024-07-20,Type 2 Diabetes
+webmd_42,webmd,Wegovy,I have been taking Wegovy for 10 months for weight management. I have lost 11 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-01-15,Weight Loss
+webmd_43,webmd,Ozempic,Ozempic works for weight loss (25 lbs in 2 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-12-18,Obesity
+webmd_44,webmd,Wegovy,I have been taking Wegovy for 12 months for weight management. I have lost 56 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-07-07,Obesity
+webmd_45,webmd,Ozempic,Ozempic works for weight loss (55 lbs in 5 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-01-23,Weight Loss
+webmd_46,webmd,Ozempic,Ozempic works for weight loss (26 lbs in 5 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-12-18,Obesity
+webmd_47,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 34 lbs. The once-weekly injection is very convenient.,4,2024-03-02,Weight Loss
+webmd_48,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 45 lbs though so trying to push through.,3,2024-08-16,Obesity
+webmd_49,webmd,Ozempic,Ozempic caused severe stomach pain and I ended up in the ER. Would not recommend.,2,2024-05-23,Type 2 Diabetes
+webmd_50,webmd,Wegovy,"After struggling with obesity for years, Wegovy finally helped me lose weight. Down 10 lbs in 12 months. Some nausea initially but it passed.",5,2024-06-29,Obesity
+webmd_51,webmd,Ozempic,Ozempic caused severe stomach pain and I ended up in the ER. Would not recommend.,1,2024-01-31,Weight Loss
+webmd_52,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-02-23,Type 2 Diabetes
+webmd_53,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 59 lbs though so trying to push through.,3,2024-06-09,Type 2 Diabetes
+webmd_54,webmd,Wegovy,Wegovy gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,1,2024-07-05,Type 2 Diabetes
+webmd_55,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 54 lbs though so trying to push through.,3,2024-07-23,Weight Loss
+webmd_56,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 46 lbs. The once-weekly injection is very convenient.,5,2024-02-22,Weight Loss
+webmd_57,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 20 lbs though so trying to push through.,3,2024-01-09,Type 2 Diabetes
+webmd_58,webmd,Ozempic,Excellent medication. Ozempic helped me lose 21 pounds and my blood sugar is now under control. Worth every penny.,5,2024-03-01,Obesity
+webmd_59,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 37 lbs. The once-weekly injection is very convenient.,4,2024-08-08,Obesity
+webmd_60,webmd,Wegovy,"After struggling with obesity for years, Wegovy finally helped me lose weight. Down 8 lbs in 2 months. Some nausea initially but it passed.",5,2024-11-28,Type 2 Diabetes
+webmd_61,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 43 lbs. The once-weekly injection is very convenient.,5,2024-05-21,Obesity
+webmd_62,webmd,Wegovy,"Terrible experience with Wegovy. Constant nausea, vomiting, and diarrhea. Had to discontinue after 11 months.",1,2024-02-26,Weight Loss
+webmd_63,webmd,Ozempic,I have been taking Ozempic for 4 months for weight management. I have lost 9 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-09-29,Weight Loss
+webmd_64,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 30 lbs.,5,2024-02-21,Weight Loss
+webmd_65,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 45 lbs. The once-weekly injection is very convenient.,4,2024-05-27,Obesity
+webmd_66,webmd,Wegovy,"Terrible experience with Wegovy. Constant nausea, vomiting, and diarrhea. Had to discontinue after 9 months.",1,2024-11-14,Type 2 Diabetes
+webmd_67,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 15 lbs though so trying to push through.,3,2024-06-10,Obesity
+webmd_68,webmd,Ozempic,"After struggling with obesity for years, Ozempic finally helped me lose weight. Down 5 lbs in 3 months. Some nausea initially but it passed.",5,2024-12-07,Type 2 Diabetes
+webmd_69,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 15 lbs. The once-weekly injection is very convenient.,5,2024-12-13,Weight Loss
+webmd_70,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 36 lbs though so trying to push through.,3,2024-05-06,Type 2 Diabetes
+webmd_71,webmd,Ozempic,I have been taking Ozempic for 4 months for weight management. I have lost 38 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-09-14,Weight Loss
+webmd_72,webmd,Ozempic,"Terrible experience with Ozempic. Constant nausea, vomiting, and diarrhea. Had to discontinue after 12 months.",2,2024-08-19,Type 2 Diabetes
+webmd_73,webmd,Wegovy,Some weight loss on Wegovy but plateaued after 11 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-05-09,Type 2 Diabetes
+webmd_74,webmd,Wegovy,"After struggling with obesity for years, Wegovy finally helped me lose weight. Down 26 lbs in 12 months. Some nausea initially but it passed.",5,2024-09-22,Obesity
+webmd_75,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 31 lbs.,4,2024-04-22,Obesity
+webmd_76,webmd,Ozempic,I have been taking Ozempic for 10 months for weight management. I have lost 52 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-12-22,Type 2 Diabetes
+webmd_77,webmd,Wegovy,I have been taking Wegovy for 7 months for weight management. I have lost 45 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-02-25,Type 2 Diabetes
+webmd_78,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 21 lbs though so trying to push through.,3,2024-12-13,Type 2 Diabetes
+webmd_79,webmd,Wegovy,Excellent medication. Wegovy helped me lose 17 pounds and my blood sugar is now under control. Worth every penny.,5,2024-01-22,Obesity
+webmd_80,webmd,Wegovy,Wegovy works for weight loss (55 lbs in 7 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-08-20,Obesity
+webmd_81,webmd,Wegovy,I have been taking Wegovy for 11 months for weight management. I have lost 14 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-08-26,Obesity
+webmd_82,webmd,Ozempic,"Lost some weight on Ozempic but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",1,2024-05-27,Weight Loss
+webmd_83,webmd,Wegovy,I have been taking Wegovy for 5 months for weight management. I have lost 57 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-10-30,Weight Loss
+webmd_84,webmd,Ozempic,I have been taking Ozempic for 6 months for weight management. I have lost 47 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-01-01,Weight Loss
+webmd_85,webmd,Wegovy,"After struggling with obesity for years, Wegovy finally helped me lose weight. Down 50 lbs in 2 months. Some nausea initially but it passed.",4,2024-05-18,Weight Loss
+webmd_86,webmd,Ozempic,I have been taking Ozempic for 4 months for weight management. I have lost 7 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-08-30,Type 2 Diabetes
+webmd_87,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 32 lbs though so trying to push through.,3,2024-07-23,Weight Loss
+webmd_88,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 16 lbs though so trying to push through.,3,2024-10-15,Type 2 Diabetes
+webmd_89,webmd,Wegovy,Wegovy works for weight loss (54 lbs in 11 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-04-12,Type 2 Diabetes
+webmd_90,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 10 lbs. The once-weekly injection is very convenient.,5,2024-06-01,Obesity
+webmd_91,webmd,Wegovy,Cannot afford Wegovy. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-09-26,Type 2 Diabetes
+webmd_92,webmd,Wegovy,"Lost some weight on Wegovy but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",2,2024-08-26,Type 2 Diabetes
+webmd_93,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 10 lbs.,4,2024-03-12,Obesity
+webmd_94,webmd,Wegovy,Wegovy gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,2,2024-10-05,Obesity
+webmd_95,webmd,Wegovy,Excellent medication. Wegovy helped me lose 47 pounds and my blood sugar is now under control. Worth every penny.,4,2024-01-04,Type 2 Diabetes
+webmd_96,webmd,Wegovy,Wegovy works for weight loss (22 lbs in 1 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-11-28,Weight Loss
+webmd_97,webmd,Wegovy,"Lost some weight on Wegovy but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",2,2024-02-01,Weight Loss
+webmd_98,webmd,Ozempic,Ozempic gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,1,2024-09-10,Weight Loss
+webmd_99,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 24 lbs though so trying to push through.,3,2024-11-17,Type 2 Diabetes
+webmd_100,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 17 lbs though so trying to push through.,3,2024-02-28,Weight Loss
+webmd_101,webmd,Ozempic,I have been taking Ozempic for 4 months for weight management. I have lost 18 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-02-23,Type 2 Diabetes
+webmd_102,webmd,Ozempic,Some weight loss on Ozempic but plateaued after 7 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-03-03,Type 2 Diabetes
+webmd_103,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 21 lbs. The once-weekly injection is very convenient.,4,2024-11-09,Obesity
+webmd_104,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 32 lbs though so trying to push through.,3,2024-03-15,Obesity
+webmd_105,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 52 lbs. The once-weekly injection is very convenient.,4,2024-12-24,Obesity
+webmd_106,webmd,Ozempic,"After struggling with obesity for years, Ozempic finally helped me lose weight. Down 11 lbs in 11 months. Some nausea initially but it passed.",5,2024-10-28,Type 2 Diabetes
+webmd_107,webmd,Wegovy,Cannot afford Wegovy. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-02-24,Type 2 Diabetes
+webmd_108,webmd,Wegovy,Wegovy works for weight loss (23 lbs in 1 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-08-22,Weight Loss
+webmd_109,webmd,Wegovy,"After struggling with obesity for years, Wegovy finally helped me lose weight. Down 46 lbs in 11 months. Some nausea initially but it passed.",4,2024-12-02,Obesity
+webmd_110,webmd,Wegovy,"After struggling with obesity for years, Wegovy finally helped me lose weight. Down 51 lbs in 8 months. Some nausea initially but it passed.",4,2024-08-22,Type 2 Diabetes
+webmd_111,webmd,Ozempic,Some weight loss on Ozempic but plateaued after 9 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-09-14,Weight Loss
+webmd_112,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 37 lbs though so trying to push through.,3,2024-02-02,Weight Loss
+webmd_113,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 50 lbs.,5,2024-03-12,Type 2 Diabetes
+webmd_114,webmd,Wegovy,Wegovy works for weight loss (35 lbs in 11 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-07-11,Type 2 Diabetes
+webmd_115,webmd,Ozempic,Ozempic gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,2,2024-06-14,Obesity
+webmd_116,webmd,Wegovy,Cannot afford Wegovy. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,1,2024-03-22,Weight Loss
+webmd_117,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-04-28,Obesity
+webmd_118,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 9 lbs. The once-weekly injection is very convenient.,5,2024-02-01,Obesity
+webmd_119,webmd,Wegovy,I have been taking Wegovy for 6 months for weight management. I have lost 43 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-11-19,Weight Loss
+webmd_120,webmd,Ozempic,Excellent medication. Ozempic helped me lose 45 pounds and my blood sugar is now under control. Worth every penny.,5,2024-10-20,Obesity
+webmd_121,webmd,Ozempic,Excellent medication. Ozempic helped me lose 23 pounds and my blood sugar is now under control. Worth every penny.,5,2024-04-25,Weight Loss
+webmd_122,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 42 lbs.,4,2024-01-13,Obesity
+webmd_123,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 54 lbs. The once-weekly injection is very convenient.,4,2024-07-27,Obesity
+webmd_124,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 58 lbs.,5,2024-04-16,Obesity
+webmd_125,webmd,Wegovy,"Lost some weight on Wegovy but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",1,2024-08-06,Obesity
+webmd_126,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 13 lbs though so trying to push through.,3,2024-09-21,Type 2 Diabetes
+webmd_127,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 39 lbs. The once-weekly injection is very convenient.,4,2024-06-18,Weight Loss
+webmd_128,webmd,Ozempic,Some weight loss on Ozempic but plateaued after 5 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-12-26,Type 2 Diabetes
+webmd_129,webmd,Ozempic,Ozempic works for weight loss (9 lbs in 5 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-09-30,Obesity
+webmd_130,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 24 lbs though so trying to push through.,3,2024-07-23,Obesity
+webmd_131,webmd,Ozempic,"Terrible experience with Ozempic. Constant nausea, vomiting, and diarrhea. Had to discontinue after 5 months.",2,2024-01-16,Weight Loss
+webmd_132,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 13 lbs. The once-weekly injection is very convenient.,5,2024-04-14,Obesity
+webmd_133,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 20 lbs though so trying to push through.,3,2024-09-09,Weight Loss
+webmd_134,webmd,Ozempic,I have been taking Ozempic for 10 months for weight management. I have lost 52 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-11-09,Weight Loss
+webmd_135,webmd,Wegovy,Some weight loss on Wegovy but plateaued after 12 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-02-23,Weight Loss
+webmd_136,webmd,Wegovy,"Lost some weight on Wegovy but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",2,2024-04-26,Weight Loss
+webmd_137,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 48 lbs. The once-weekly injection is very convenient.,5,2024-01-10,Obesity
+webmd_138,webmd,Wegovy,Excellent medication. Wegovy helped me lose 49 pounds and my blood sugar is now under control. Worth every penny.,4,2024-08-06,Obesity
+webmd_139,webmd,Ozempic,I have been taking Ozempic for 6 months for weight management. I have lost 17 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-06-24,Type 2 Diabetes
+webmd_140,webmd,Ozempic,I have been taking Ozempic for 4 months for weight management. I have lost 31 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-10-01,Obesity
+webmd_141,webmd,Ozempic,Ozempic works for weight loss (20 lbs in 12 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-01-30,Weight Loss
+webmd_142,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 25 lbs. The once-weekly injection is very convenient.,5,2024-06-28,Obesity
+webmd_143,webmd,Ozempic,Ozempic works for weight loss (30 lbs in 10 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-09-02,Obesity
+webmd_144,webmd,Ozempic,"Terrible experience with Ozempic. Constant nausea, vomiting, and diarrhea. Had to discontinue after 9 months.",2,2024-09-10,Obesity
+webmd_145,webmd,Wegovy,Wegovy works for weight loss (50 lbs in 8 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-06-03,Type 2 Diabetes
+webmd_146,webmd,Wegovy,Wegovy works for weight loss (22 lbs in 9 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-06-12,Obesity
+webmd_147,webmd,Ozempic,Excellent medication. Ozempic helped me lose 10 pounds and my blood sugar is now under control. Worth every penny.,5,2024-04-14,Weight Loss
+webmd_148,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 28 lbs.,4,2024-03-13,Weight Loss
+webmd_149,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,1,2024-01-18,Type 2 Diabetes
+webmd_150,webmd,Wegovy,"Lost some weight on Wegovy but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",1,2024-11-08,Type 2 Diabetes
+webmd_151,webmd,Wegovy,Excellent medication. Wegovy helped me lose 7 pounds and my blood sugar is now under control. Worth every penny.,5,2024-04-24,Weight Loss
+webmd_152,webmd,Wegovy,Excellent medication. Wegovy helped me lose 24 pounds and my blood sugar is now under control. Worth every penny.,4,2024-01-17,Obesity
+webmd_153,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 58 lbs though so trying to push through.,3,2024-05-14,Obesity
+webmd_154,webmd,Ozempic,"Lost some weight on Ozempic but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",2,2024-01-30,Weight Loss
+webmd_155,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 59 lbs though so trying to push through.,3,2024-09-30,Type 2 Diabetes
+webmd_156,webmd,Wegovy,Wegovy gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,2,2024-08-27,Obesity
+webmd_157,webmd,Ozempic,I have been taking Ozempic for 11 months for weight management. I have lost 22 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-02-13,Weight Loss
+webmd_158,webmd,Wegovy,Excellent medication. Wegovy helped me lose 22 pounds and my blood sugar is now under control. Worth every penny.,4,2024-07-04,Type 2 Diabetes
+webmd_159,webmd,Wegovy,Wegovy gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,1,2024-10-18,Obesity
+webmd_160,webmd,Wegovy,Wegovy works for weight loss (34 lbs in 8 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-01-09,Type 2 Diabetes
+webmd_161,webmd,Ozempic,"After struggling with obesity for years, Ozempic finally helped me lose weight. Down 59 lbs in 11 months. Some nausea initially but it passed.",5,2024-10-11,Weight Loss
+webmd_162,webmd,Wegovy,I have been taking Wegovy for 10 months for weight management. I have lost 40 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-06-09,Weight Loss
+webmd_163,webmd,Wegovy,"After struggling with obesity for years, Wegovy finally helped me lose weight. Down 13 lbs in 8 months. Some nausea initially but it passed.",5,2024-04-26,Obesity
+webmd_164,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 12 lbs.,4,2024-12-01,Weight Loss
+webmd_165,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-04-26,Weight Loss
+webmd_166,webmd,Wegovy,Wegovy works for weight loss (59 lbs in 11 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-06-29,Obesity
+webmd_167,webmd,Ozempic,"Lost some weight on Ozempic but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",1,2024-08-15,Weight Loss
+webmd_168,webmd,Ozempic,"After struggling with obesity for years, Ozempic finally helped me lose weight. Down 31 lbs in 11 months. Some nausea initially but it passed.",5,2024-02-06,Obesity
+webmd_169,webmd,Wegovy,Wegovy works for weight loss (25 lbs in 1 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-11-06,Type 2 Diabetes
+webmd_170,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 35 lbs though so trying to push through.,3,2024-05-30,Obesity
+webmd_171,webmd,Ozempic,I have been taking Ozempic for 3 months for weight management. I have lost 42 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-01-14,Weight Loss
+webmd_172,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 54 lbs though so trying to push through.,3,2024-09-17,Obesity
+webmd_173,webmd,Wegovy,Some weight loss on Wegovy but plateaued after 10 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-12-02,Obesity
+webmd_174,webmd,Ozempic,I have been taking Ozempic for 4 months for weight management. I have lost 41 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-09-14,Obesity
+webmd_175,webmd,Wegovy,"Terrible experience with Wegovy. Constant nausea, vomiting, and diarrhea. Had to discontinue after 10 months.",1,2024-12-03,Obesity
+webmd_176,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 26 lbs. The once-weekly injection is very convenient.,5,2024-05-04,Type 2 Diabetes
+webmd_177,webmd,Ozempic,I have been taking Ozempic for 8 months for weight management. I have lost 51 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-07-28,Type 2 Diabetes
+webmd_178,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 46 lbs.,4,2024-09-04,Obesity
+webmd_179,webmd,Ozempic,Excellent medication. Ozempic helped me lose 57 pounds and my blood sugar is now under control. Worth every penny.,4,2024-03-05,Obesity
+webmd_180,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,1,2024-05-26,Type 2 Diabetes
+webmd_181,webmd,Wegovy,Excellent medication. Wegovy helped me lose 14 pounds and my blood sugar is now under control. Worth every penny.,5,2024-10-21,Type 2 Diabetes
+webmd_182,webmd,Ozempic,Some weight loss on Ozempic but plateaued after 1 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-03-02,Type 2 Diabetes
+webmd_183,webmd,Wegovy,Cannot afford Wegovy. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,1,2024-01-18,Type 2 Diabetes
+webmd_184,webmd,Ozempic,"Terrible experience with Ozempic. Constant nausea, vomiting, and diarrhea. Had to discontinue after 9 months.",1,2024-09-28,Type 2 Diabetes
+webmd_185,webmd,Wegovy,Excellent medication. Wegovy helped me lose 23 pounds and my blood sugar is now under control. Worth every penny.,4,2024-03-01,Type 2 Diabetes
+webmd_186,webmd,Wegovy,Wegovy gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,1,2024-02-07,Obesity
+webmd_187,webmd,Wegovy,Some weight loss on Wegovy but plateaued after 11 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-08-11,Type 2 Diabetes
+webmd_188,webmd,Wegovy,Wegovy caused severe stomach pain and I ended up in the ER. Would not recommend.,1,2024-10-30,Obesity
+webmd_189,webmd,Wegovy,Cannot afford Wegovy. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-03-31,Obesity
+webmd_190,webmd,Wegovy,Wegovy works for weight loss (24 lbs in 4 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-09-09,Type 2 Diabetes
+webmd_191,webmd,Ozempic,Ozempic gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,2,2024-07-15,Type 2 Diabetes
+webmd_192,webmd,Ozempic,Ozempic works for weight loss (51 lbs in 12 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-04-17,Type 2 Diabetes
+webmd_193,webmd,Wegovy,Wegovy gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,2,2024-05-25,Weight Loss
+webmd_194,webmd,Ozempic,Excellent medication. Ozempic helped me lose 15 pounds and my blood sugar is now under control. Worth every penny.,5,2024-05-27,Type 2 Diabetes
+webmd_195,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 14 lbs though so trying to push through.,3,2024-02-19,Weight Loss
+webmd_196,webmd,Ozempic,I have been taking Ozempic for 1 months for weight management. I have lost 36 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-01-14,Type 2 Diabetes
+webmd_197,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 33 lbs.,5,2024-09-23,Weight Loss
+webmd_198,webmd,Wegovy,I have been taking Wegovy for 8 months for weight management. I have lost 32 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-09-09,Type 2 Diabetes
+webmd_199,webmd,Ozempic,Some weight loss on Ozempic but plateaued after 12 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-02-29,Type 2 Diabetes
+webmd_200,webmd,Ozempic,Ozempic caused severe stomach pain and I ended up in the ER. Would not recommend.,1,2024-09-16,Type 2 Diabetes
+webmd_201,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 49 lbs.,4,2024-06-10,Weight Loss
+webmd_202,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 58 lbs.,5,2024-10-12,Obesity
+webmd_203,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 20 lbs though so trying to push through.,3,2024-03-11,Obesity
+webmd_204,webmd,Wegovy,Wegovy works for weight loss (17 lbs in 11 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-05-15,Type 2 Diabetes
+webmd_205,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 13 lbs. The once-weekly injection is very convenient.,5,2024-04-11,Obesity
+webmd_206,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 18 lbs though so trying to push through.,3,2024-01-02,Type 2 Diabetes
+webmd_207,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 16 lbs.,4,2024-01-20,Type 2 Diabetes
+webmd_208,webmd,Wegovy,Wegovy gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,1,2024-09-04,Obesity
+webmd_209,webmd,Ozempic,Ozempic works for weight loss (47 lbs in 5 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-09-05,Type 2 Diabetes
+webmd_210,webmd,Wegovy,Wegovy gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,2,2024-04-22,Weight Loss
+webmd_211,webmd,Wegovy,Excellent medication. Wegovy helped me lose 47 pounds and my blood sugar is now under control. Worth every penny.,5,2024-08-05,Weight Loss
+webmd_212,webmd,Ozempic,"After struggling with obesity for years, Ozempic finally helped me lose weight. Down 49 lbs in 6 months. Some nausea initially but it passed.",4,2024-07-22,Obesity
+webmd_213,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-12-17,Weight Loss
+webmd_214,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 8 lbs.,4,2024-10-14,Type 2 Diabetes
+webmd_215,webmd,Wegovy,Cannot afford Wegovy. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-07-23,Type 2 Diabetes
+webmd_216,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 57 lbs. The once-weekly injection is very convenient.,5,2024-01-24,Type 2 Diabetes
+webmd_217,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 18 lbs.,4,2024-11-16,Weight Loss
+webmd_218,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 6 lbs.,4,2024-07-13,Weight Loss
+webmd_219,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 46 lbs though so trying to push through.,3,2024-01-26,Obesity
+webmd_220,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 30 lbs. The once-weekly injection is very convenient.,4,2024-04-27,Type 2 Diabetes
+webmd_221,webmd,Ozempic,Some weight loss on Ozempic but plateaued after 7 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-10-10,Obesity
+webmd_222,webmd,Ozempic,Ozempic works for weight loss (53 lbs in 1 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-09-26,Weight Loss
+webmd_223,webmd,Wegovy,"Terrible experience with Wegovy. Constant nausea, vomiting, and diarrhea. Had to discontinue after 5 months.",1,2024-01-13,Weight Loss
+webmd_224,webmd,Ozempic,I have been taking Ozempic for 11 months for weight management. I have lost 30 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-03-08,Obesity
+webmd_225,webmd,Wegovy,Wegovy works for weight loss (37 lbs in 2 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-12-26,Obesity
+webmd_226,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 52 lbs.,4,2024-10-28,Type 2 Diabetes
+webmd_227,webmd,Ozempic,Some weight loss on Ozempic but plateaued after 6 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-09-19,Obesity
+webmd_228,webmd,Ozempic,Excellent medication. Ozempic helped me lose 21 pounds and my blood sugar is now under control. Worth every penny.,4,2024-12-01,Obesity
+webmd_229,webmd,Wegovy,Excellent medication. Wegovy helped me lose 31 pounds and my blood sugar is now under control. Worth every penny.,4,2024-10-14,Type 2 Diabetes
+webmd_230,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 6 lbs.,4,2024-09-11,Obesity
+webmd_231,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 11 lbs though so trying to push through.,3,2024-08-19,Weight Loss
+webmd_232,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 35 lbs. The once-weekly injection is very convenient.,5,2024-10-15,Weight Loss
+webmd_233,webmd,Wegovy,I have been taking Wegovy for 9 months for weight management. I have lost 15 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-04-16,Type 2 Diabetes
+webmd_234,webmd,Ozempic,Excellent medication. Ozempic helped me lose 51 pounds and my blood sugar is now under control. Worth every penny.,5,2024-10-17,Weight Loss
+webmd_235,webmd,Ozempic,"Lost some weight on Ozempic but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",2,2024-06-21,Weight Loss
+webmd_236,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 22 lbs.,5,2024-12-19,Weight Loss
+webmd_237,webmd,Wegovy,"Lost some weight on Wegovy but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",1,2024-12-28,Type 2 Diabetes
+webmd_238,webmd,Ozempic,Some weight loss on Ozempic but plateaued after 12 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-07-11,Weight Loss
+webmd_239,webmd,Ozempic,I have been taking Ozempic for 4 months for weight management. I have lost 33 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-02-28,Weight Loss
+webmd_240,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 52 lbs.,5,2024-10-07,Type 2 Diabetes
+webmd_241,webmd,Wegovy,I have been taking Wegovy for 5 months for weight management. I have lost 51 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-12-12,Type 2 Diabetes
+webmd_242,webmd,Wegovy,"Lost some weight on Wegovy but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",1,2024-09-24,Obesity
+webmd_243,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 38 lbs though so trying to push through.,3,2024-11-05,Type 2 Diabetes
+webmd_244,webmd,Wegovy,"After struggling with obesity for years, Wegovy finally helped me lose weight. Down 38 lbs in 3 months. Some nausea initially but it passed.",4,2024-08-30,Weight Loss
+webmd_245,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 5 lbs. The once-weekly injection is very convenient.,5,2024-06-08,Obesity
+webmd_246,webmd,Ozempic,I have been taking Ozempic for 6 months for weight management. I have lost 11 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-02-01,Obesity
+webmd_247,webmd,Wegovy,"Terrible experience with Wegovy. Constant nausea, vomiting, and diarrhea. Had to discontinue after 11 months.",2,2024-04-25,Type 2 Diabetes
+webmd_248,webmd,Ozempic,Some weight loss on Ozempic but plateaued after 5 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-08-06,Obesity
+webmd_249,webmd,Wegovy,Excellent medication. Wegovy helped me lose 39 pounds and my blood sugar is now under control. Worth every penny.,5,2024-11-24,Obesity
+webmd_250,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 18 lbs. The once-weekly injection is very convenient.,4,2024-05-23,Weight Loss
+webmd_251,webmd,Wegovy,Wegovy caused severe stomach pain and I ended up in the ER. Would not recommend.,2,2024-10-30,Obesity
+webmd_252,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 47 lbs though so trying to push through.,3,2024-08-30,Weight Loss
+webmd_253,webmd,Ozempic,Ozempic has significantly reduced my appetite. I no longer obsess over food and have lost 56 lbs. The once-weekly injection is very convenient.,4,2024-11-10,Weight Loss
+webmd_254,webmd,Ozempic,I have been taking Ozempic for 2 months for weight management. I have lost 8 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-03-11,Obesity
+webmd_255,webmd,Wegovy,Excellent medication. Wegovy helped me lose 37 pounds and my blood sugar is now under control. Worth every penny.,5,2024-03-01,Weight Loss
+webmd_256,webmd,Wegovy,Excellent medication. Wegovy helped me lose 24 pounds and my blood sugar is now under control. Worth every penny.,5,2024-09-24,Type 2 Diabetes
+webmd_257,webmd,Ozempic,Ozempic works for weight loss (45 lbs in 3 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-05-22,Obesity
+webmd_258,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 36 lbs though so trying to push through.,3,2024-12-21,Type 2 Diabetes
+webmd_259,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-07-06,Type 2 Diabetes
+webmd_260,webmd,Wegovy,Wegovy caused severe stomach pain and I ended up in the ER. Would not recommend.,1,2024-04-01,Obesity
+webmd_261,webmd,Ozempic,"After struggling with obesity for years, Ozempic finally helped me lose weight. Down 42 lbs in 1 months. Some nausea initially but it passed.",4,2024-06-07,Type 2 Diabetes
+webmd_262,webmd,Ozempic,Some weight loss on Ozempic but plateaued after 9 months. Nausea comes and goes. Not sure if I'll continue.,3,2024-11-06,Type 2 Diabetes
+webmd_263,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-12-26,Type 2 Diabetes
+webmd_264,webmd,Wegovy,Wegovy gave me pancreatitis. I was hospitalized for a week. Be very careful with this medication.,1,2024-11-07,Obesity
+webmd_265,webmd,Wegovy,Excellent medication. Wegovy helped me lose 28 pounds and my blood sugar is now under control. Worth every penny.,4,2024-01-15,Obesity
+webmd_266,webmd,Ozempic,Ozempic caused severe stomach pain and I ended up in the ER. Would not recommend.,1,2024-03-02,Weight Loss
+webmd_267,webmd,Wegovy,"Terrible experience with Wegovy. Constant nausea, vomiting, and diarrhea. Had to discontinue after 2 months.",2,2024-10-05,Type 2 Diabetes
+webmd_268,webmd,Ozempic,"Terrible experience with Ozempic. Constant nausea, vomiting, and diarrhea. Had to discontinue after 11 months.",2,2024-06-11,Obesity
+webmd_269,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 28 lbs though so trying to push through.,3,2024-09-21,Weight Loss
+webmd_270,webmd,Wegovy,I have been taking Wegovy for 4 months for weight management. I have lost 57 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-09-13,Weight Loss
+webmd_271,webmd,Wegovy,Excellent medication. Wegovy helped me lose 43 pounds and my blood sugar is now under control. Worth every penny.,4,2024-04-11,Obesity
+webmd_272,webmd,Wegovy,I have been taking Wegovy for 5 months for weight management. I have lost 40 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-06-28,Weight Loss
+webmd_273,webmd,Wegovy,I have been taking Wegovy for 2 months for weight management. I have lost 12 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-02-16,Weight Loss
+webmd_274,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 55 lbs.,4,2024-01-06,Weight Loss
+webmd_275,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 46 lbs. The once-weekly injection is very convenient.,5,2024-04-07,Obesity
+webmd_276,webmd,Ozempic,Excellent medication. Ozempic helped me lose 22 pounds and my blood sugar is now under control. Worth every penny.,5,2024-03-12,Obesity
+webmd_277,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 16 lbs. The once-weekly injection is very convenient.,5,2024-05-31,Type 2 Diabetes
+webmd_278,webmd,Wegovy,Excellent medication. Wegovy helped me lose 28 pounds and my blood sugar is now under control. Worth every penny.,5,2024-06-27,Obesity
+webmd_279,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 7 lbs though so trying to push through.,3,2024-10-26,Type 2 Diabetes
+webmd_280,webmd,Ozempic,Ozempic caused severe stomach pain and I ended up in the ER. Would not recommend.,2,2024-12-15,Type 2 Diabetes
+webmd_281,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 37 lbs.,5,2024-04-17,Type 2 Diabetes
+webmd_282,webmd,Ozempic,I have been taking Ozempic for 9 months for weight management. I have lost 47 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-11-19,Weight Loss
+webmd_283,webmd,Wegovy,Life changing! Wegovy reduced my food noise completely. I eat reasonable portions now and have lost 41 lbs.,5,2024-07-12,Obesity
+webmd_284,webmd,Ozempic,I have been taking Ozempic for 1 months for weight management. I have lost 15 pounds with minimal side effects. Highly recommend discussing with your doctor.,5,2024-08-03,Type 2 Diabetes
+webmd_285,webmd,Wegovy,I have been taking Wegovy for 6 months for weight management. I have lost 24 pounds with minimal side effects. Highly recommend discussing with your doctor.,4,2024-03-24,Type 2 Diabetes
+webmd_286,webmd,Ozempic,Cannot afford Ozempic. My insurance denied coverage and the out of pocket cost is over $1000 per month. Healthcare system is broken.,2,2024-12-21,Type 2 Diabetes
+webmd_287,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 28 lbs. The once-weekly injection is very convenient.,5,2024-11-03,Type 2 Diabetes
+webmd_288,webmd,Wegovy,"Lost some weight on Wegovy but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",1,2024-09-16,Weight Loss
+webmd_289,webmd,Wegovy,"After struggling with obesity for years, Wegovy finally helped me lose weight. Down 6 lbs in 10 months. Some nausea initially but it passed.",5,2024-03-24,Obesity
+webmd_290,webmd,Ozempic,Ozempic helped with appetite but I get terrible headaches. Lost 38 lbs though so trying to push through.,3,2024-04-11,Obesity
+webmd_291,webmd,Ozempic,"After struggling with obesity for years, Ozempic finally helped me lose weight. Down 24 lbs in 2 months. Some nausea initially but it passed.",4,2024-03-13,Type 2 Diabetes
+webmd_292,webmd,Wegovy,Excellent medication. Wegovy helped me lose 14 pounds and my blood sugar is now under control. Worth every penny.,4,2024-04-12,Weight Loss
+webmd_293,webmd,Wegovy,Wegovy has significantly reduced my appetite. I no longer obsess over food and have lost 32 lbs. The once-weekly injection is very convenient.,4,2024-02-16,Obesity
+webmd_294,webmd,Ozempic,Life changing! Ozempic reduced my food noise completely. I eat reasonable portions now and have lost 35 lbs.,5,2024-03-22,Type 2 Diabetes
+webmd_295,webmd,Ozempic,Excellent medication. Ozempic helped me lose 47 pounds and my blood sugar is now under control. Worth every penny.,4,2024-07-11,Type 2 Diabetes
+webmd_296,webmd,Ozempic,"Terrible experience with Ozempic. Constant nausea, vomiting, and diarrhea. Had to discontinue after 3 months.",2,2024-03-09,Type 2 Diabetes
+webmd_297,webmd,Wegovy,Wegovy helped with appetite but I get terrible headaches. Lost 60 lbs though so trying to push through.,3,2024-08-05,Obesity
+webmd_298,webmd,Wegovy,"Lost some weight on Wegovy but the side effects were not worth it. Sulfur burps, constipation, and fatigue daily.",2,2024-10-27,Weight Loss
+webmd_299,webmd,Ozempic,Ozempic works for weight loss (28 lbs in 4 months) but the GI side effects are significant. You need to weigh the pros and cons.,3,2024-07-04,Type 2 Diabetes
