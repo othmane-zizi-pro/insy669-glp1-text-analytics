@@ -1,19 +1,52 @@
 {
-  "public_mean_sentiment": -0.06948109090909091,
-  "media_mean_sentiment": 0.03267174999999999,
-  "t_statistic": -3.7680068480636892,
-  "p_value": 0.00017093681742983964,
-  "cosine_similarity": 0.3329133871568656,
-  "public_n": 1100,
-  "media_n": 400,
+  "public_mean_sentiment": 0.0778,
+  "media_mean_sentiment": -0.1365,
+  "t_statistic": 7.783,
+  "p_value": 0.0,
+  "cohens_d": 0.358,
+  "cosine_similarity": 0.342,
+  "public_n": 4246,
+  "media_n": 634,
+  "reddit_n": 3246,
+  "webmd_n": 1000,
+  "news_n": 634,
   "public_sentiment_dist": {
-    "negative": 478,
-    "positive": 372,
-    "neutral": 250
+    "positive": 2156,
+    "negative": 1744,
+    "neutral": 346
   },
   "media_sentiment_dist": {
-    "positive": 212,
-    "negative": 142,
-    "neutral": 46
-  }
+    "negative": 314,
+    "positive": 178,
+    "neutral": 142
+  },
+  "nb_accuracy": 0.9779,
+  "nb_best_alpha": 0.1,
+  "knn_accuracy": 0.9619,
+  "knn_best_k": 9,
+  "kmeans_purity": 0.87,
+  "top_public_features": [
+    "day",
+    "anyone",
+    "lb",
+    "since",
+    "back",
+    "feeling",
+    "experience",
+    "anyone else",
+    "lot",
+    "little"
+  ],
+  "top_media_features": [
+    "cnn",
+    "healthline",
+    "obesity drug",
+    "nbc",
+    "medscape",
+    "cnbc",
+    "nbc news",
+    "kff",
+    "healio",
+    "weightloss drug"
+  ]
 }
