@@ -57,6 +57,11 @@ df_reddit = pd.read_csv(f'{DATA_DIR}/reddit_posts.csv')
 df_webmd = pd.read_csv(f'{DATA_DIR}/webmd_reviews.csv')
 df_news = pd.read_csv(f'{DATA_DIR}/news_articles.csv')
 
+# Filter WebMD to 2024 only (align all corpora to same time window)
+df_webmd['date'] = pd.to_datetime(df_webmd['date'])
+df_webmd = df_webmd[df_webmd['date'].dt.year == 2024].reset_index(drop=True)
+print(f"WebMD filtered to 2024: {len(df_webmd)} reviews")
+
 # Create unified corpora
 df_public = pd.concat([
     df_reddit[['id', 'text', 'date']].assign(source='reddit'),
@@ -190,6 +195,46 @@ plt.tight_layout()
 plt.savefig(f'{FIG_DIR}/sentiment_pies.png')
 plt.close()
 print("Saved sentiment_pies.png")
+
+# --- Source-level sentiment breakdowns (Reddit vs WebMD vs News) ---
+df_reddit_sent = df_public[df_public['source'] == 'reddit']['sentiment']
+df_webmd_sent = df_public[df_public['source'] == 'webmd']['sentiment']
+df_news_sent = df_media['sentiment']
+
+print(f"\nPer-source sentiment means:")
+print(f"  Reddit: {df_reddit_sent.mean():.4f} (n={len(df_reddit_sent)})")
+print(f"  WebMD:  {df_webmd_sent.mean():.4f} (n={len(df_webmd_sent)})")
+print(f"  News:   {df_news_sent.mean():.4f} (n={len(df_news_sent)})")
+
+# Pairwise Mann-Whitney U tests
+pairs = [('Reddit', 'WebMD', df_reddit_sent, df_webmd_sent),
+         ('Reddit', 'News', df_reddit_sent, df_news_sent),
+         ('WebMD', 'News', df_webmd_sent, df_news_sent)]
+pairwise_results = {}
+for name1, name2, s1, s2 in pairs:
+    u_stat, u_p = stats.mannwhitneyu(s1, s2, alternative='two-sided')
+    pairwise_results[f'{name1}_vs_{name2}'] = {'U': round(float(u_stat), 2), 'p': round(float(u_p), 6)}
+    print(f"  {name1} vs {name2}: U={u_stat:.2f}, p={u_p:.6f}")
+
+# Figure: Three-source sentiment boxplot
+fig, ax = plt.subplots(figsize=(10, 6))
+data_3src = [df_reddit_sent, df_webmd_sent, df_news_sent]
+bp = ax.boxplot(data_3src, labels=['Reddit', 'WebMD', 'News'],
+                patch_artist=True, widths=0.5)
+bp['boxes'][0].set_facecolor('#2196F3')
+bp['boxes'][1].set_facecolor('#4CAF50')
+bp['boxes'][2].set_facecolor('#FF9800')
+for box in bp['boxes']:
+    box.set_alpha(0.7)
+ax.set_ylabel('VADER Compound Score')
+ax.set_title('Sentiment by Source: Reddit vs WebMD vs News', fontweight='bold')
+ax.axhline(0, color='gray', linestyle=':', alpha=0.5)
+ax.annotate('All pairwise p < 0.001\n(Mann-Whitney U)', xy=(2, max(df_reddit_sent.max(), df_webmd_sent.max(), df_news_sent.max())),
+            fontsize=10, ha='center', fontweight='bold')
+plt.tight_layout()
+plt.savefig(f'{FIG_DIR}/sentiment_boxplot_3source.png')
+plt.close()
+print("Saved sentiment_boxplot_3source.png")
 
 
 # =============================================================================
@@ -369,22 +414,60 @@ plt.savefig(f'{FIG_DIR}/side_effects.png')
 plt.close()
 print("Saved side_effects.png")
 
-# Temporal Sentiment
+# Three-source side effects breakdown
+reddit_text_lower = ' '.join(df_public[df_public['source'] == 'reddit']['clean'].dropna()).lower()
+webmd_text_lower = ' '.join(df_public[df_public['source'] == 'webmd']['clean'].dropna()).lower()
+news_text_lower = med_text_lower
+
+se_data_3src = []
+for se in side_effects:
+    se_data_3src.append({
+        'side_effect': se,
+        'reddit': reddit_text_lower.count(se),
+        'webmd': webmd_text_lower.count(se),
+        'news': news_text_lower.count(se)
+    })
+df_se_3src = pd.DataFrame(se_data_3src).sort_values('reddit', ascending=False)
+
+fig, ax = plt.subplots(figsize=(14, 7))
+x = np.arange(len(df_se_3src))
+width = 0.25
+ax.bar(x - width, df_se_3src['reddit'], width, label='Reddit', color='#2196F3', alpha=0.8)
+ax.bar(x, df_se_3src['webmd'], width, label='WebMD', color='#4CAF50', alpha=0.8)
+ax.bar(x + width, df_se_3src['news'], width, label='News', color='#FF9800', alpha=0.8)
+ax.set_xticks(x)
+ax.set_xticklabels(df_se_3src['side_effect'], rotation=45, ha='right')
+ax.set_ylabel('Mention Count')
+ax.set_title('Side Effects by Source: Reddit vs WebMD vs News', fontweight='bold')
+ax.legend()
+plt.tight_layout()
+plt.savefig(f'{FIG_DIR}/side_effects_3source.png')
+plt.close()
+print("Saved side_effects_3source.png")
+
+# Temporal Sentiment (with per-source lines)
 df_public['month'] = pd.to_datetime(df_public['date'], errors='coerce').dt.to_period('M')
 df_media['month'] = pd.to_datetime(df_media['date'], errors='coerce').dt.to_period('M')
 
 pub_monthly = df_public.groupby('month')['sentiment'].mean()
 med_monthly = df_media.groupby('month')['sentiment'].mean()
 
-fig, ax = plt.subplots(figsize=(12, 6))
-if len(pub_monthly) > 1:
-    ax.plot(pub_monthly.index.astype(str), pub_monthly.values, 'o-', color='#2196F3', linewidth=2, label='Public')
+# Per-source monthly
+reddit_monthly = df_public[df_public['source'] == 'reddit'].groupby('month')['sentiment'].mean()
+webmd_monthly = df_public[df_public['source'] == 'webmd'].groupby('month')['sentiment'].mean()
+
+fig, ax = plt.subplots(figsize=(14, 6))
+if len(reddit_monthly) > 1:
+    ax.plot(reddit_monthly.index.astype(str), reddit_monthly.values, 'o-', color='#2196F3', linewidth=2, label='Reddit')
+if len(webmd_monthly) > 1:
+    ax.plot(webmd_monthly.index.astype(str), webmd_monthly.values, '^--', color='#4CAF50', linewidth=1.5,
+            label='WebMD (indicative, small n)', alpha=0.7)
 if len(med_monthly) > 1:
-    ax.plot(med_monthly.index.astype(str), med_monthly.values, 's-', color='#FF9800', linewidth=2, label='Media')
+    ax.plot(med_monthly.index.astype(str), med_monthly.values, 's-', color='#FF9800', linewidth=2, label='News')
 ax.axhline(0, color='gray', linestyle=':', alpha=0.5)
 ax.set_xlabel('Month')
 ax.set_ylabel('Mean VADER Sentiment')
-ax.set_title('Monthly Sentiment Trends: Public vs Media', fontweight='bold')
+ax.set_title('Monthly Sentiment Trends by Source', fontweight='bold')
 ax.legend()
 plt.xticks(rotation=45)
 plt.tight_layout()
@@ -589,6 +672,350 @@ print(f"\nK-Means (k=2) Purity: {purity:.3f}")
 
 
 # =============================================================================
+# NOTEBOOK 08: ASPECT-BASED SENTIMENT
+# =============================================================================
+print("\n" + "=" * 60)
+print("NOTEBOOK 08: ASPECT-BASED SENTIMENT")
+print("=" * 60)
+
+from sklearn.linear_model import LogisticRegression
+
+aspect_keywords = {
+    'side_effects': ['nausea', 'vomiting', 'diarrhea', 'constipation', 'headache', 'fatigue',
+                     'hair loss', 'pancreatitis', 'gastroparesis', 'sulfur burp', 'dizz', 'bloat'],
+    'efficacy': ['weight loss', 'pound', 'a1c', 'effective', 'result', 'progress', 'lost weight',
+                 'blood sugar', 'bmi'],
+    'cost': ['cost', 'price', 'expensive', 'insurance', 'coverage', 'afford', 'coupon', 'copay',
+             'out of pocket'],
+    'access': ['shortage', 'supply', 'pharmacy', 'prescription', 'prior authorization',
+               'backorder', 'available', 'stock'],
+    'mental_health': ['depression', 'anxiety', 'mood', 'suicidal', 'brain fog', 'mental health',
+                      'emotional'],
+    'food_relationship': ['appetite', 'food noise', 'craving', 'hunger', 'binge', 'eating',
+                          'food aversion'],
+    'dosage': ['dose', 'titration', 'injection', 'pen', 'needle', 'milligram', 'weekly shot']
+}
+
+
+def tag_aspects(text):
+    text_lower = str(text).lower()
+    matched = []
+    for aspect, keywords in aspect_keywords.items():
+        if any(kw in text_lower for kw in keywords):
+            matched.append(aspect)
+    return matched
+
+
+# Tag all documents
+df_all_aspects = pd.concat([
+    df_public[['text', 'sentiment', 'source']],
+    df_media[['text', 'sentiment', 'source']]
+], ignore_index=True)
+df_all_aspects['aspects'] = df_all_aspects['text'].apply(tag_aspects)
+
+# Explode and compute per-aspect per-source sentiment
+rows = []
+for _, row in df_all_aspects.iterrows():
+    for aspect in row['aspects']:
+        rows.append({'aspect': aspect, 'sentiment': row['sentiment'], 'source': row['source']})
+df_aspect_sent = pd.DataFrame(rows)
+
+# Map sources to public/media
+df_aspect_sent['corpus'] = df_aspect_sent['source'].map(
+    {'reddit': 'public', 'webmd': 'public', 'news': 'media'})
+
+aspect_means = df_aspect_sent.groupby(['aspect', 'corpus'])['sentiment'].mean().unstack(fill_value=0)
+print("\nAspect sentiment means (public vs media):")
+print(aspect_means.round(4).to_string())
+
+# Discrepancy: public - media
+if 'public' in aspect_means.columns and 'media' in aspect_means.columns:
+    aspect_means['discrepancy'] = aspect_means['public'] - aspect_means['media']
+
+    # Per-aspect Mann-Whitney U
+    aspect_stats = {}
+    for aspect in aspect_means.index:
+        pub_scores = df_aspect_sent[(df_aspect_sent['aspect'] == aspect) &
+                                     (df_aspect_sent['corpus'] == 'public')]['sentiment']
+        med_scores = df_aspect_sent[(df_aspect_sent['aspect'] == aspect) &
+                                     (df_aspect_sent['corpus'] == 'media')]['sentiment']
+        if len(pub_scores) >= 5 and len(med_scores) >= 5:
+            u, p = stats.mannwhitneyu(pub_scores, med_scores, alternative='two-sided')
+            aspect_stats[aspect] = {'U': round(float(u), 2), 'p': round(float(p), 6),
+                                     'pub_n': len(pub_scores), 'med_n': len(med_scores)}
+            sig = '*' if p < 0.05 else ''
+            print(f"  {aspect}: U={u:.1f}, p={p:.4f} {sig}")
+        else:
+            aspect_stats[aspect] = {'U': None, 'p': None,
+                                     'pub_n': len(pub_scores), 'med_n': len(med_scores)}
+            print(f"  {aspect}: insufficient data (pub={len(pub_scores)}, med={len(med_scores)})")
+
+    # Figure: Grouped bar chart - aspect sentiment by corpus
+    fig, ax = plt.subplots(figsize=(12, 6))
+    aspects_sorted = aspect_means.sort_values('discrepancy').index.tolist()
+    x = np.arange(len(aspects_sorted))
+    width = 0.35
+    pub_vals = [aspect_means.loc[a, 'public'] for a in aspects_sorted]
+    med_vals = [aspect_means.loc[a, 'media'] for a in aspects_sorted]
+    ax.bar(x - width / 2, pub_vals, width, label='Public', color='#2196F3', alpha=0.8)
+    ax.bar(x + width / 2, med_vals, width, label='Media', color='#FF9800', alpha=0.8)
+    ax.set_xticks(x)
+    ax.set_xticklabels([a.replace('_', ' ').title() for a in aspects_sorted], rotation=30, ha='right')
+    ax.set_ylabel('Mean VADER Sentiment')
+    ax.set_title('Aspect-Based Sentiment: Public vs Media', fontweight='bold')
+    ax.axhline(0, color='gray', linestyle=':', alpha=0.5)
+    ax.legend()
+    plt.tight_layout()
+    plt.savefig(f'{FIG_DIR}/aspect_sentiment_comparison.png')
+    plt.close()
+    print("Saved aspect_sentiment_comparison.png")
+
+    # Figure: Diverging bar chart - discrepancy
+    fig, ax = plt.subplots(figsize=(10, 6))
+    disc_vals = [aspect_means.loc[a, 'discrepancy'] for a in aspects_sorted]
+    colors_disc = ['#2196F3' if v >= 0 else '#F44336' for v in disc_vals]
+    bars = ax.barh(range(len(aspects_sorted)), disc_vals, color=colors_disc, alpha=0.8)
+    ax.set_yticks(range(len(aspects_sorted)))
+    ax.set_yticklabels([a.replace('_', ' ').title() for a in aspects_sorted])
+    ax.axvline(0, color='black', linewidth=0.8)
+    ax.set_xlabel('Sentiment Discrepancy (Public - Media)')
+    ax.set_title('Public vs Media Sentiment Gap by Aspect', fontweight='bold')
+    # Add significance stars
+    for i, aspect in enumerate(aspects_sorted):
+        if aspect in aspect_stats and aspect_stats[aspect]['p'] is not None:
+            if aspect_stats[aspect]['p'] < 0.05:
+                ax.text(disc_vals[i] + 0.02 * np.sign(disc_vals[i]), i, '*',
+                        fontsize=14, ha='center', va='center', fontweight='bold')
+    plt.tight_layout()
+    plt.savefig(f'{FIG_DIR}/aspect_discrepancy.png')
+    plt.close()
+    print("Saved aspect_discrepancy.png")
+
+    # Discrepancy classifier: logistic regression predicting source from aspect features
+    # Feature vector: binary aspect presence + overall sentiment per document
+    aspect_list = sorted(aspect_keywords.keys())
+    feature_rows = []
+    labels_clf = []
+    for _, row in df_all_aspects.iterrows():
+        feat = {f'has_{a}': int(a in row['aspects']) for a in aspect_list}
+        feat['sentiment'] = row['sentiment']
+        feature_rows.append(feat)
+        labels_clf.append('public' if row['source'] in ('reddit', 'webmd') else 'media')
+
+    df_clf_feat = pd.DataFrame(feature_rows)
+    X_aspect = df_clf_feat.values
+    y_aspect = np.array(labels_clf)
+
+    lr = LogisticRegression(max_iter=1000, random_state=42)
+    lr_scores = cross_val_score(lr, X_aspect, y_aspect, cv=5, scoring='accuracy')
+    lr_mean_acc = lr_scores.mean()
+    print(f"\nDiscrepancy classifier (LogReg) 5-fold CV accuracy: {lr_mean_acc:.4f}")
+    print(f"  Per-fold: {[round(s, 4) for s in lr_scores]}")
+
+    # Feature importance from fitted model
+    lr.fit(X_aspect, y_aspect)
+    coef_names = [f'has_{a}' for a in aspect_list] + ['sentiment']
+    coef_importance = dict(zip(coef_names, lr.coef_[0].round(4)))
+    print(f"  Feature coefficients: {coef_importance}")
+
+else:
+    aspect_stats = {}
+    lr_mean_acc = None
+    coef_importance = {}
+    print("  Skipped discrepancy analysis (missing public or media in aspect data)")
+
+
+# =============================================================================
+# NOTEBOOK 09: TEMPORAL LEAD-LAG ANALYSIS
+# =============================================================================
+print("\n" + "=" * 60)
+print("NOTEBOOK 09: TEMPORAL LEAD-LAG")
+print("=" * 60)
+
+from statsmodels.tsa.stattools import adfuller, grangercausalitytests
+
+# Weekly sentiment time series
+df_public['date_parsed'] = pd.to_datetime(df_public['date'], errors='coerce')
+df_media['date_parsed'] = pd.to_datetime(df_media['date'], errors='coerce')
+
+df_public['week'] = df_public['date_parsed'].dt.to_period('W')
+df_media['week'] = df_media['date_parsed'].dt.to_period('W')
+
+pub_weekly = df_public.groupby('week').agg(
+    sentiment=('sentiment', 'mean'), count=('sentiment', 'size')).reset_index()
+med_weekly = df_media.groupby('week').agg(
+    sentiment=('sentiment', 'mean'), count=('sentiment', 'size')).reset_index()
+
+# Merge on common weeks
+pub_weekly['week_str'] = pub_weekly['week'].astype(str)
+med_weekly['week_str'] = med_weekly['week'].astype(str)
+weekly_merged = pub_weekly.merge(med_weekly, on='week_str', suffixes=('_pub', '_med'))
+print(f"Common weeks for analysis: {len(weekly_merged)}")
+print(f"  Public weekly mean docs: {weekly_merged['count_pub'].mean():.1f}")
+print(f"  Media weekly mean docs: {weekly_merged['count_med'].mean():.1f}")
+
+granger_results = {}
+
+if len(weekly_merged) >= 15:
+    pub_ts = weekly_merged['sentiment_pub'].values
+    med_ts = weekly_merged['sentiment_med'].values
+
+    # ADF stationarity tests
+    adf_pub = adfuller(pub_ts, maxlag=4)
+    adf_med = adfuller(med_ts, maxlag=4)
+    print(f"\nADF test - Public: stat={adf_pub[0]:.3f}, p={adf_pub[1]:.4f}")
+    print(f"ADF test - Media:  stat={adf_med[0]:.3f}, p={adf_med[1]:.4f}")
+
+    # First-difference if non-stationary
+    use_diff = False
+    if adf_pub[1] > 0.05 or adf_med[1] > 0.05:
+        print("Non-stationary series detected, applying first differencing")
+        pub_ts_use = np.diff(pub_ts)
+        med_ts_use = np.diff(med_ts)
+        use_diff = True
+    else:
+        pub_ts_use = pub_ts
+        med_ts_use = med_ts
+
+    # Cross-correlation at lags -8 to +8
+    max_lag = min(8, len(pub_ts_use) // 3)
+    cc_lags = range(-max_lag, max_lag + 1)
+    cc_values = []
+    for lag in cc_lags:
+        if lag < 0:
+            cc = np.corrcoef(pub_ts_use[:lag], med_ts_use[-lag:])[0, 1]
+        elif lag > 0:
+            cc = np.corrcoef(pub_ts_use[lag:], med_ts_use[:-lag])[0, 1]
+        else:
+            cc = np.corrcoef(pub_ts_use, med_ts_use)[0, 1]
+        cc_values.append(cc if not np.isnan(cc) else 0)
+
+    best_lag = list(cc_lags)[np.argmax(np.abs(cc_values))]
+    best_cc = cc_values[np.argmax(np.abs(cc_values))]
+    print(f"\nCross-correlation peak: lag={best_lag} weeks, r={best_cc:.3f}")
+    diff_label = " (first-differenced)" if use_diff else ""
+
+    # Figure: Weekly sentiment time series
+    fig, ax = plt.subplots(figsize=(14, 6))
+    ax.plot(range(len(weekly_merged)), weekly_merged['sentiment_pub'].values,
+            'o-', color='#2196F3', linewidth=1.5, markersize=4, label='Public')
+    ax.plot(range(len(weekly_merged)), weekly_merged['sentiment_med'].values,
+            's-', color='#FF9800', linewidth=1.5, markersize=4, label='Media')
+    ax.axhline(0, color='gray', linestyle=':', alpha=0.5)
+    ax.set_xlabel('Week Index')
+    ax.set_ylabel('Mean VADER Sentiment')
+    ax.set_title('Weekly Sentiment: Public vs Media', fontweight='bold')
+    ax.legend()
+    plt.tight_layout()
+    plt.savefig(f'{FIG_DIR}/weekly_sentiment_timeseries.png')
+    plt.close()
+    print("Saved weekly_sentiment_timeseries.png")
+
+    # Figure: Cross-correlation
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.bar(list(cc_lags), cc_values, color='#2196F3', alpha=0.7)
+    ax.axhline(0, color='black', linewidth=0.5)
+    # Significance band (approx 95% CI)
+    ci = 1.96 / np.sqrt(len(pub_ts_use))
+    ax.axhline(ci, color='red', linestyle='--', alpha=0.5, label=f'95% CI ({ci:.2f})')
+    ax.axhline(-ci, color='red', linestyle='--', alpha=0.5)
+    ax.set_xlabel(f'Lag (weeks){diff_label}')
+    ax.set_ylabel('Cross-Correlation')
+    ax.set_title('Cross-Correlation: Public vs Media Sentiment', fontweight='bold')
+    ax.legend()
+    plt.tight_layout()
+    plt.savefig(f'{FIG_DIR}/crosscorrelation.png')
+    plt.close()
+    print("Saved crosscorrelation.png")
+
+    # Granger causality tests (max lag = 4)
+    granger_max = min(4, len(pub_ts_use) // 5)
+    if granger_max >= 1:
+        print(f"\nGranger causality tests (max lag = {granger_max}):")
+        print(f"  Caveat: ~{len(weekly_merged)} weekly observations is marginal for Granger causality")
+
+        try:
+            data_m2p = np.column_stack([pub_ts_use, med_ts_use])
+            gc_m2p = grangercausalitytests(data_m2p, maxlag=granger_max, verbose=False)
+            best_gc_m2p_p = min(gc_m2p[lag][0]['ssr_ftest'][1] for lag in range(1, granger_max + 1))
+            granger_results['media_causes_public'] = {
+                'best_p': round(best_gc_m2p_p, 6),
+                'significant': best_gc_m2p_p < 0.05,
+                'max_lag': granger_max
+            }
+            print(f"  Media -> Public: best p={best_gc_m2p_p:.4f} {'(significant)' if best_gc_m2p_p < 0.05 else '(not significant)'}")
+        except Exception as e:
+            print(f"  Media -> Public: test failed ({e})")
+            granger_results['media_causes_public'] = {'error': str(e)}
+
+        try:
+            data_p2m = np.column_stack([med_ts_use, pub_ts_use])
+            gc_p2m = grangercausalitytests(data_p2m, maxlag=granger_max, verbose=False)
+            best_gc_p2m_p = min(gc_p2m[lag][0]['ssr_ftest'][1] for lag in range(1, granger_max + 1))
+            granger_results['public_causes_media'] = {
+                'best_p': round(best_gc_p2m_p, 6),
+                'significant': best_gc_p2m_p < 0.05,
+                'max_lag': granger_max
+            }
+            print(f"  Public -> Media: best p={best_gc_p2m_p:.4f} {'(significant)' if best_gc_p2m_p < 0.05 else '(not significant)'}")
+        except Exception as e:
+            print(f"  Public -> Media: test failed ({e})")
+            granger_results['public_causes_media'] = {'error': str(e)}
+
+        # Figure: Granger results summary table
+        fig, ax = plt.subplots(figsize=(8, 3))
+        ax.axis('off')
+        table_data = [
+            ['Direction', 'Best p-value', 'Significant (p<0.05)', 'Max Lag'],
+        ]
+        for direction, label in [('media_causes_public', 'Media -> Public'),
+                                  ('public_causes_media', 'Public -> Media')]:
+            if direction in granger_results and 'best_p' in granger_results[direction]:
+                r = granger_results[direction]
+                table_data.append([label, f"{r['best_p']:.4f}",
+                                   'Yes' if r['significant'] else 'No', str(r['max_lag'])])
+            else:
+                table_data.append([label, 'N/A', 'N/A', 'N/A'])
+        table = ax.table(cellText=table_data, loc='center', cellLoc='center')
+        table.auto_set_font_size(False)
+        table.set_fontsize(11)
+        table.scale(1.2, 1.5)
+        # Bold header row
+        for j in range(len(table_data[0])):
+            table[0, j].set_text_props(fontweight='bold')
+        ax.set_title(f'Granger Causality Results (~{len(weekly_merged)} weeks)\n'
+                     'Note: marginal sample size; results are indicative', fontweight='bold', fontsize=11)
+        plt.tight_layout()
+        plt.savefig(f'{FIG_DIR}/granger_results.png')
+        plt.close()
+        print("Saved granger_results.png")
+
+    # Volume time series: weekly document counts
+    fig, ax = plt.subplots(figsize=(14, 5))
+    ax.bar(np.arange(len(weekly_merged)) - 0.2, weekly_merged['count_pub'].values,
+           0.4, label='Public', color='#2196F3', alpha=0.7)
+    ax.bar(np.arange(len(weekly_merged)) + 0.2, weekly_merged['count_med'].values,
+           0.4, label='Media', color='#FF9800', alpha=0.7)
+    ax.set_xlabel('Week Index')
+    ax.set_ylabel('Document Count')
+    ax.set_title('Weekly Volume: Public vs Media', fontweight='bold')
+    ax.legend()
+    plt.tight_layout()
+    plt.savefig(f'{FIG_DIR}/weekly_volume.png')
+    plt.close()
+    print("Saved weekly_volume.png")
+
+    vol_corr = np.corrcoef(weekly_merged['count_pub'].values, weekly_merged['count_med'].values)[0, 1]
+    print(f"Volume correlation (public vs media): r={vol_corr:.3f}")
+
+else:
+    print("Insufficient weekly data for lead-lag analysis")
+    best_lag = None
+    best_cc = None
+    vol_corr = None
+
+
+# =============================================================================
 # SAVE ANALYSIS STATS
 # =============================================================================
 print("\n" + "=" * 60)
@@ -598,9 +1025,13 @@ print("=" * 60)
 analysis_stats = {
     "public_mean_sentiment": round(df_public['sentiment'].mean(), 4),
     "media_mean_sentiment": round(df_media['sentiment'].mean(), 4),
+    "reddit_mean_sentiment": round(df_reddit_sent.mean(), 4),
+    "webmd_mean_sentiment": round(df_webmd_sent.mean(), 4),
+    "news_mean_sentiment": round(df_news_sent.mean(), 4),
     "t_statistic": round(t_stat, 3),
     "p_value": round(p_val, 6),
     "cohens_d": round(cohens_d, 3),
+    "pairwise_mannwhitney": pairwise_results,
     "cosine_similarity": round(cos_sim_score, 3),
     "public_n": len(df_public),
     "media_n": len(df_media),
@@ -616,10 +1047,18 @@ analysis_stats = {
     "kmeans_purity": round(purity, 3),
     "top_public_features": top_public_features,
     "top_media_features": top_media_features,
+    "aspect_sentiment": aspect_means.to_dict() if 'public' in aspect_means.columns else {},
+    "aspect_stats": aspect_stats,
+    "discrepancy_classifier_accuracy": round(lr_mean_acc, 4) if lr_mean_acc else None,
+    "discrepancy_classifier_coefficients": coef_importance,
+    "granger_results": granger_results,
+    "crosscorrelation_peak_lag": best_lag,
+    "crosscorrelation_peak_r": round(best_cc, 4) if best_cc else None,
+    "volume_correlation": round(vol_corr, 4) if vol_corr else None,
 }
 
 with open(f'{DATA_DIR}/analysis_stats.json', 'w') as f:
-    json.dump(analysis_stats, f, indent=2)
+    json.dump(analysis_stats, f, indent=2, default=str)
 
-print(json.dumps(analysis_stats, indent=2))
+print(json.dumps(analysis_stats, indent=2, default=str))
 print("\nAll analysis complete. All figures regenerated.")

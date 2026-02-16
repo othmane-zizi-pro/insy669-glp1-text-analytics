@@ -1,52 +1,170 @@
 {
-  "public_mean_sentiment": 0.0778,
+  "public_mean_sentiment": 0.1212,
   "media_mean_sentiment": -0.1365,
-  "t_statistic": 7.783,
+  "reddit_mean_sentiment": 0.1347,
+  "webmd_mean_sentiment": -0.3077,
+  "news_mean_sentiment": -0.1365,
+  "t_statistic": 9.43,
   "p_value": 0.0,
-  "cohens_d": 0.358,
-  "cosine_similarity": 0.342,
-  "public_n": 4246,
+  "cohens_d": 0.436,
+  "kruskal_wallis_H": 136.378,
+  "kruskal_wallis_p": 0.0,
+  "pairwise_mannwhitney": {
+    "Reddit_vs_WebMD": {
+      "U": 228652.5,
+      "p": 0.0
+    },
+    "Reddit_vs_News": {
+      "U": 1287452.5,
+      "p": 0.0
+    },
+    "WebMD_vs_News": {
+      "U": 24907.5,
+      "p": 0.000183
+    }
+  },
+  "cosine_similarity": 0.346,
+  "public_n": 3348,
   "media_n": 634,
   "reddit_n": 3246,
-  "webmd_n": 1000,
+  "webmd_n": 102,
   "news_n": 634,
   "public_sentiment_dist": {
-    "positive": 2156,
-    "negative": 1744,
-    "neutral": 346
+    "positive": 1774,
+    "negative": 1267,
+    "neutral": 307
   },
   "media_sentiment_dist": {
     "negative": 314,
     "positive": 178,
     "neutral": 142
   },
-  "nb_accuracy": 0.9779,
+  "nb_accuracy": 0.9769,
   "nb_best_alpha": 0.1,
-  "knn_accuracy": 0.9619,
-  "knn_best_k": 9,
-  "kmeans_purity": 0.87,
+  "knn_accuracy": 0.9535,
+  "knn_best_k": 11,
+  "kmeans_purity": 0.841,
   "top_public_features": [
-    "day",
     "anyone",
+    "day",
     "lb",
     "since",
     "back",
-    "feeling",
-    "experience",
     "anyone else",
+    "experience",
+    "feeling",
     "lot",
-    "little"
+    "anything"
   ],
   "top_media_features": [
     "cnn",
     "healthline",
     "obesity drug",
-    "nbc",
     "medscape",
+    "nbc",
     "cnbc",
     "nbc news",
-    "kff",
     "healio",
-    "weightloss drug"
-  ]
+    "npr",
+    "kff"
+  ],
+  "aspect_sentiment": {
+    "media": {
+      "access": -0.3505741176470588,
+      "cost": -0.022739726027397256,
+      "dosage": -0.1504625,
+      "efficacy": -0.3279373333333333,
+      "food_relationship": -0.09325454545454544,
+      "mental_health": -0.7350333333333334,
+      "side_effects": -0.19756
+    },
+    "public": {
+      "access": 0.20110875331564987,
+      "cost": 0.15921015228426397,
+      "dosage": 0.07677975460122699,
+      "efficacy": 0.13554295774647887,
+      "food_relationship": 0.12521325,
+      "mental_health": -0.10053687943262411,
+      "side_effects": -0.034444745762711865
+    },
+    "discrepancy": {
+      "access": 0.5516828709627086,
+      "cost": 0.18194987831166123,
+      "dosage": 0.227242254601227,
+      "efficacy": 0.46348029107981215,
+      "food_relationship": 0.21846779545454542,
+      "mental_health": 0.6344964539007093,
+      "side_effects": 0.16311525423728815
+    }
+  },
+  "aspect_stats": {
+    "access": {
+      "U": 23754.5,
+      "p": 0.0,
+      "pub_n": 377,
+      "med_n": 85
+    },
+    "cost": {
+      "U": 16905.5,
+      "p": 0.017128,
+      "pub_n": 394,
+      "med_n": 73
+    },
+    "dosage": {
+      "U": 24754.0,
+      "p": 0.071229,
+      "pub_n": 1304,
+      "med_n": 32
+    },
+    "efficacy": {
+      "U": 172967.5,
+      "p": 0.0,
+      "pub_n": 1136,
+      "med_n": 225
+    },
+    "food_relationship": {
+      "U": 5181.5,
+      "p": 0.311489,
+      "pub_n": 800,
+      "med_n": 11
+    },
+    "mental_health": {
+      "U": 894.5,
+      "p": 0.040016,
+      "pub_n": 141,
+      "med_n": 9
+    },
+    "side_effects": {
+      "U": 3185.0,
+      "p": 0.666181,
+      "pub_n": 590,
+      "med_n": 10
+    }
+  },
+  "discrepancy_classifier_accuracy": 0.8365,
+  "discrepancy_classifier_coefficients": {
+    "has_access": -0.1089,
+    "has_cost": 0.0305,
+    "has_dosage": 2.2354,
+    "has_efficacy": -0.0387,
+    "has_food_relationship": 2.3886,
+    "has_mental_health": 0.843,
+    "has_side_effects": 2.1825,
+    "sentiment": 0.8903
+  },
+  "granger_results": {
+    "media_causes_public": {
+      "best_p": 0.370085,
+      "significant": "False",
+      "max_lag": 4
+    },
+    "public_causes_media": {
+      "best_p": 0.300074,
+      "significant": "False",
+      "max_lag": 4
+    }
+  },
+  "crosscorrelation_peak_lag": -7,
+  "crosscorrelation_peak_r": 0.3089,
+  "volume_correlation": 0.0646
 }

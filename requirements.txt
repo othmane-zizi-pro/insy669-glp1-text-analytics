@@ -11,3 +11,4 @@ lxml>=4.9.0
 jupyter>=1.0.0
 nbconvert>=7.0.0
 python-pptx>=0.6.21
+statsmodels>=0.14.0
