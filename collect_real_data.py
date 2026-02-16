@@ -1,17 +1,22 @@
 """
 Real data collection script for INSY 669 GLP-1 Text Analytics project.
-Collects from: Arctic Shift (Reddit), WebMD (scraping), Google News RSS (scraping)
-No API keys required.
+Collects from: Arctic Shift (Reddit), WebMD (scraping), Google News RSS.
 """
+
+import argparse
+import os
+import re
+import time
+from datetime import datetime
 
 import pandas as pd
 import requests
-import time
-import re
-import json
-from datetime import datetime
 from bs4 import BeautifulSoup
-import os
+
+try:
+    from googlenewsdecoder import gnewsdecoder
+except Exception:  # pragma: no cover - optional dependency at runtime.
+    gnewsdecoder = None
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 
@@ -22,6 +27,103 @@ HEADERS = {
 # Date range: Jan 1, 2024 to Nov 30, 2024
 AFTER_TS = int(datetime(2024, 1, 1).timestamp())
 BEFORE_TS = int(datetime(2024, 11, 30).timestamp())
+
+MIN_BODY_TOKENS_DEFAULT = 80
+MAX_BODY_CHARS = 12000
+
+
+def normalize_whitespace(text):
+    """Collapse whitespace and coerce null-ish values to empty string."""
+    if pd.isna(text):
+        return ''
+    return re.sub(r'\s+', ' ', str(text)).strip()
+
+
+def clean_snippet_text(text):
+    """Strip lightweight HTML/noise from RSS snippets."""
+    raw = normalize_whitespace(text)
+    if not raw:
+        return ''
+    soup = BeautifulSoup(raw, 'html.parser')
+    cleaned = soup.get_text(' ', strip=True)
+    return normalize_whitespace(cleaned)
+
+
+def decode_news_url(rss_url):
+    """
+    Decode Google News RSS article URLs to direct publisher URLs when possible.
+    Returns the original URL if decoder is unavailable or decoding fails.
+    """
+    url = normalize_whitespace(rss_url)
+    if not url:
+        return ''
+    if 'news.google.com/rss/articles/' not in url:
+        return url
+    if gnewsdecoder is None:
+        return url
+    try:
+        decoded = gnewsdecoder(url, interval=0)
+    except Exception:
+        return url
+    if decoded.get('status') and decoded.get('decoded_url'):
+        return normalize_whitespace(decoded['decoded_url'])
+    return url
+
+
+def extract_article_body(article_url, timeout=15):
+    """
+    Fetch and extract main article text using robust HTML heuristics.
+    Returns empty string on failure.
+    """
+    url = normalize_whitespace(article_url)
+    if not url or 'news.google.com/rss/articles/' in url:
+        return ''
+
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=timeout)
+        resp.raise_for_status()
+    except Exception:
+        return ''
+
+    soup = BeautifulSoup(resp.text, 'lxml')
+
+    # Remove obvious non-content nodes before extraction.
+    for tag in soup(['script', 'style', 'noscript', 'svg', 'footer', 'nav', 'aside', 'form', 'header']):
+        tag.decompose()
+
+    selectors = [
+        'article',
+        'main',
+        '[itemprop="articleBody"]',
+        '.article-body',
+        '.story-body',
+        '.entry-content',
+        '.post-content',
+    ]
+
+    candidates = []
+    for selector in selectors:
+        for node in soup.select(selector):
+            txt = normalize_whitespace(node.get_text(' ', strip=True))
+            if len(txt) >= 300:
+                candidates.append(txt)
+
+    if not candidates:
+        paragraphs = []
+        for node in soup.find_all('p'):
+            txt = normalize_whitespace(node.get_text(' ', strip=True))
+            if len(txt) >= 40:
+                paragraphs.append(txt)
+        if paragraphs:
+            joined = normalize_whitespace(' '.join(paragraphs))
+            if len(joined) >= 300:
+                candidates.append(joined)
+
+    if not candidates:
+        return ''
+
+    best = max(candidates, key=len)
+    return best[:MAX_BODY_CHARS]
 
 
 # =============================================================================
@@ -214,9 +316,25 @@ def collect_webmd():
 # 3. NEWS ARTICLES via Google News RSS + article scraping
 # =============================================================================
 
-def collect_news():
-    """Collect news articles about GLP-1 drugs via Google News RSS."""
+def collect_news(fetch_body=False, body_timeout=15, min_body_tokens=MIN_BODY_TOKENS_DEFAULT):
+    """
+    Collect news articles about GLP-1 drugs via Google News RSS.
+
+    Args:
+        fetch_body: If True, decode Google URLs and scrape full article bodies.
+        body_timeout: HTTP timeout (seconds) for body fetching.
+        min_body_tokens: Minimum token threshold to treat body extraction as usable.
+    """
     print("\n[3/3] Collecting news articles via Google News RSS...")
+    if fetch_body:
+        if gnewsdecoder is None:
+            raise RuntimeError(
+                "Full-body collection requested but `googlenewsdecoder` is not installed. "
+                "Run: pip install googlenewsdecoder"
+            )
+        print("  Full-body mode enabled (decoding publisher URLs + scraping article bodies).")
+    else:
+        print("  Snippet-only mode enabled (title + description).")
 
     queries = [
         'Ozempic weight loss',
@@ -232,6 +350,8 @@ def collect_news():
     all_articles = []
     seen_titles = set()
     article_id = 0
+    body_success = 0
+    body_attempts = 0
 
     for query in queries:
         print(f"  Searching: '{query}'...")
@@ -270,13 +390,27 @@ def collect_news():
             source_name = source_el.get_text(strip=True) if source_el else 'Unknown'
 
             description = item.find('description')
-            desc_text = description.get_text(strip=True) if description else ''
+            desc_html = description.get_text(' ', strip=True) if description else ''
+            desc_text = clean_snippet_text(desc_html)
+
+            link_el = item.find('link')
+            rss_link = link_el.get_text(strip=True) if link_el else ''
+            article_url = decode_news_url(rss_link) if fetch_body else normalize_whitespace(rss_link)
 
             # Combine title and description
-            text = f"{title_text}. {desc_text}" if desc_text else title_text
+            text_snippet = f"{title_text}. {desc_text}" if desc_text else title_text
+            text_snippet = normalize_whitespace(text_snippet)
+            text_body = ''
+            body_tokens = 0
+            if fetch_body and article_url:
+                body_attempts += 1
+                text_body = normalize_whitespace(extract_article_body(article_url, timeout=body_timeout))
+                body_tokens = len(text_body.split()) if text_body else 0
+                if body_tokens >= min_body_tokens:
+                    body_success += 1
 
             # Determine drug mentioned
-            text_lower = text.lower()
+            text_lower = text_snippet.lower()
             if 'ozempic' in text_lower:
                 drug = 'Ozempic'
             elif 'wegovy' in text_lower:
@@ -298,7 +432,15 @@ def collect_news():
             all_articles.append({
                 'id': f'news_{article_id}',
                 'source': source_name,
-                'text': text,
+                # Keep legacy `text` as snippet for backward compatibility.
+                'text': text_snippet,
+                'text_snippet': text_snippet,
+                'text_body': text_body,
+                'body_token_count': body_tokens,
+                'rss_link': rss_link,
+                'article_url': article_url,
+                'title': normalize_whitespace(title_text),
+                'description': desc_text,
                 'date': date_str,
                 'drug_mentioned': drug,
                 'category': cat,
@@ -311,6 +453,12 @@ def collect_news():
     out_path = os.path.join(DATA_DIR, 'news_articles.csv')
     df.to_csv(out_path, index=False)
     print(f"  Saved {len(df)} news articles to {out_path}")
+    if fetch_body:
+        coverage = (body_success / body_attempts * 100.0) if body_attempts else 0.0
+        print(
+            f"  Full-body extraction usable for {body_success}/{body_attempts} "
+            f"articles ({coverage:.1f}%, min_body_tokens={min_body_tokens})"
+        )
     return df
 
 
@@ -318,7 +466,30 @@ def collect_news():
 # MAIN
 # =============================================================================
 
+def build_parser():
+    parser = argparse.ArgumentParser(description="Collect Reddit, WebMD, and news data.")
+    parser.add_argument(
+        '--fetch-news-body',
+        action='store_true',
+        help='Decode Google News links and scrape full article bodies into `text_body`.',
+    )
+    parser.add_argument(
+        '--news-body-timeout',
+        type=int,
+        default=15,
+        help='HTTP timeout (seconds) for article body fetches.',
+    )
+    parser.add_argument(
+        '--min-body-tokens',
+        type=int,
+        default=MIN_BODY_TOKENS_DEFAULT,
+        help='Minimum body token threshold for extraction quality reporting.',
+    )
+    return parser
+
+
 if __name__ == '__main__':
+    args = build_parser().parse_args()
     os.makedirs(DATA_DIR, exist_ok=True)
 
     print("Starting real data collection...")
@@ -326,7 +497,11 @@ if __name__ == '__main__':
 
     df_reddit = collect_reddit()
     df_webmd = collect_webmd()
-    df_news = collect_news()
+    df_news = collect_news(
+        fetch_body=args.fetch_news_body,
+        body_timeout=max(5, args.news_body_timeout),
+        min_body_tokens=max(10, args.min_body_tokens),
+    )
 
     print("\n" + "=" * 50)
     print("COLLECTION SUMMARY")

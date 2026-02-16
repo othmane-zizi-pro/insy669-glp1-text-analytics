@@ -6,117 +6,171 @@
 ![NLTK](https://img.shields.io/badge/NLTK-3.8%2B-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
----
-
 ## Project Overview
+This project compares language and sentiment in:
+- **Public discourse**: Reddit + WebMD reviews
+- **Media discourse**: Google News RSS article snippets with optional full-article body enrichment
 
-This project applies text analytics techniques to compare **media coverage** versus **public opinion** surrounding GLP-1 receptor agonist weight loss drugs, specifically **Ozempic** (semaglutide) and **Wegovy** (semaglutide for weight management). 
+The repository includes:
+- data collection scripts
+- notebook workflow for exploration
+- a reproducible script-first analysis pipeline that regenerates outputs end-to-end
 
-GLP-1 drugs have experienced explosive growth in popularity, but how the media frames these medications may differ significantly from how actual users experience them. We analyze ~1,500 documents across two corpora to uncover these differences.
+## What Changed (Methodology Fixes)
+This repository now includes the following major methodology improvements:
 
-## Team Members
+1. **Schema/date reliability across script + notebooks**
+- Shared utilities in `analysis_utils.py` standardize date parsing and sentiment schema.
+- Pipeline enforces required columns and surfaces clear errors when inputs are malformed.
 
-| Name | Student ID |
-|------|-----------|
-| Vasilis Christopoulos | 261278396 |
-| Hugo Guideau | 261261108 |
-| Saksi Khosla | 261284778 |
-| Mustafa Yousuf | 261265412 |
-| Othmane Zizi | 261255341 |
+2. **Leakage-safe classification**
+- Naive Bayes and KNN now run in `Pipeline` objects with `StratifiedKFold` + `GridSearchCV`.
+- No global pre-fit vectorizer is reused across folds.
+
+3. **Media text confound mitigation**
+- News collection supports optional full-body extraction (`text_body`) with decoded publisher URLs.
+- Analysis supports `--media-text-mode {snippet,body,hybrid}`.
+- `hybrid` is recommended: use `text_body` when available, fallback to snippet.
+
+4. **Length-normalized robustness track**
+- A normalized analysis track (`clean_norm40` by default) remains available for confound checks.
+- Normalized metrics are saved alongside full-text metrics.
+
+5. **Script-first UX**
+- `project_cli.py` is the canonical entrypoint for validation, analysis-only, and recollect+analysis runs.
+
+## Canonical Workflow (Recommended)
+The canonical path is **script-first** using `project_cli.py`.
+
+### 1. Setup
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python -c "import nltk; nltk.download('vader_lexicon'); nltk.download('punkt'); nltk.download('punkt_tab'); nltk.download('stopwords'); nltk.download('wordnet')"
+```
+
+### 2. Validate environment and files
+```bash
+python project_cli.py validate
+```
+
+### 3. Run analysis from existing data
+```bash
+python project_cli.py run-analysis --media-text-mode hybrid
+```
+
+### 4. (Optional) Recollect data then run analysis
+```bash
+python project_cli.py run-all --fetch-news-body --media-text-mode hybrid
+```
+
+`media-text-mode` options:
+- `snippet`: use title + description only
+- `body`: use `text_body` only (requires body-enriched news data)
+- `hybrid` (recommended): use `text_body` when available, otherwise fallback to snippet
+
+## Sensitivity Workflow (Recommended for Reporting)
+Run all three media modes on the **same frozen dataset** and compare outputs:
+
+```bash
+mkdir -p results
+
+python project_cli.py run-analysis --media-text-mode snippet --media-body-min-tokens 80 --normalized-token-cap 40
+cp data/analysis_stats.json results/analysis_stats_snippet.json
+
+python project_cli.py run-analysis --media-text-mode hybrid --media-body-min-tokens 80 --normalized-token-cap 40
+cp data/analysis_stats.json results/analysis_stats_hybrid.json
+
+python project_cli.py run-analysis --media-text-mode body --media-body-min-tokens 80 --normalized-token-cap 40
+cp data/analysis_stats.json results/analysis_stats_body.json
+```
+
+Reporting rule of thumb:
+- Use `hybrid` as primary.
+- Treat findings as strong only if direction is stable across `snippet/hybrid/body` and full vs normalized tracks.
+
+## Notebook Workflow (Secondary / Exploratory)
+Notebooks are kept for exploration and presentation.  
+Primary reproducibility should come from the script workflow above.
+
+Notebook order:
+1. `notebooks/01-data-collection.ipynb`
+2. `notebooks/02-preprocessing.ipynb`
+3. `notebooks/03-sentiment.ipynb`
+4. `notebooks/04-associations.ipynb`
+5. `notebooks/05-comparison.ipynb`
+6. `notebooks/06-classification.ipynb`
+7. `notebooks/07-topic-modeling.ipynb`
+8. `notebooks/08-aspect-sentiment.ipynb`
+9. `notebooks/09-temporal-leadlag.ipynb`
 
 ## Data Sources
+- **Reddit**: Arctic Shift API (subreddits around Ozempic/Wegovy/Semaglutide)
+- **WebMD**: scraped patient reviews
+- **Media**: Google News RSS search results
+  - Base schema keeps snippet text for compatibility (`text`)
+  - Optional enrichment adds `text_body` (publisher article text), `article_url`, and `text_snippet`
 
-### Public Opinion Corpus (1,100 documents)
-- **Reddit** (800 posts): r/Ozempic, r/Semaglutide, r/WegovyWeightLoss
-- **WebMD** (300 reviews): Patient reviews for Ozempic and Wegovy
+## Method Summary
+1. Data collection and schema normalization (with optional media full-body enrichment)
+2. Text preprocessing (tokenization, stopword removal, lemmatization)
+3. Sentiment analysis (VADER)
+4. Associations/comparison (PMI, TF-IDF, cosine similarity, side-effect coverage)
+5. Classification (Naive Bayes + KNN with leakage-safe CV pipelines)
+6. Topic modeling/clustering (LDA, K-Means)
+7. Aspect-based sentiment
+8. Temporal lead-lag analysis
+9. **Length-normalized robustness track** (`clean_norm40`) to reduce format/length confounding
+10. **Media text mode robustness** (`snippet` vs `body` vs `hybrid`) to reduce headline-only bias
 
-### Media Corpus (400 documents)
-- **News Articles**: Reuters, CNN Health, NYT, STAT News, Medical News Today, NPR Health, and others
+## Key Outputs
+- Processed datasets: `data/public_processed.csv`, `data/media_processed.csv`
+- Sentiment datasets: `data/public_with_sentiment.csv`, `data/media_with_sentiment.csv`
+- Stats summary: `data/analysis_stats.json`
+- Figures: `figures/*.png` (baseline + normalized robustness figures)
 
-## Methodology
+Notable normalized outputs:
+- `figures/tfidf_comparison_normalized.png`
+- `figures/classification_comparison_normalized.png`
+- `figures/side_effects_normalized_rate.png`
+- JSON keys:
+  - `cosine_similarity_normalized`
+  - `nb_accuracy_normalized`
+  - `knn_accuracy_normalized`
+  - `side_effect_rates_per_1k_tokens`
+  - `side_effect_doc_prevalence`
+  - `media_text_mode`
+  - `media_body_coverage`
+  - `media_docs_fallback_to_snippet`
 
-1. **Data Collection**: Web scraping using BeautifulSoup, PRAW (Reddit API), and NewsAPI
-2. **Text Preprocessing**: Tokenization, stopword removal, lemmatization (NLTK)
-3. **Feature Extraction**: Bag-of-Words, TF-IDF representations (unigrams + bigrams)
-4. **Sentiment Analysis**: VADER sentiment scoring with statistical testing (t-test, Cohen's d)
-5. **Word Associations**: PMI (Pointwise Mutual Information) and Lift metrics
-6. **Corpus Comparison**: TF-IDF keyword analysis, cosine similarity, MDS visualization, side effects gap analysis
-7. **Text Classification**: Naive Bayes (Multinomial) and K-Nearest Neighbors classifiers to distinguish media from public text, with hyperparameter tuning via GridSearchCV and cross-validation
-8. **Topic Modeling & Clustering**: LDA (Latent Dirichlet Allocation) for latent theme discovery in each corpus, K-Means clustering on combined TF-IDF to evaluate natural corpus separation
+## Troubleshooting
+- **`validate` fails on NLTK resources**: run the NLTK download command in setup.
+- **Missing `data/*.csv` for `run-analysis`**: run `python project_cli.py run-all` or place expected files in `data/`.
+- **`media_text_mode=body` fails**: recollect with `python project_cli.py run-all --fetch-news-body` so `data/news_articles.csv` includes `text_body`.
+- **`run-all --fetch-news-body` is slow**: full-body extraction depends on publisher response times and can take several minutes.
+- **Interrupted collection leaves partial files**: rerun the specific collector (for example `python collect_webmd_real.py`) before analysis.
+- **Date parsing issues in notebooks**: use updated notebooks that import `analysis_utils.py`.
+- **Long runtime**: classification uses grid-search cross-validation and can take several minutes.
 
 ## Repository Structure
-
-```
-├── README.md
+```text
+├── project_cli.py
+├── run_all_analysis.py
+├── analysis_utils.py
+├── collect_real_data.py
+├── collect_reddit_v2.py
+├── collect_webmd_real.py
+├── collect_webmd_and_clean.py
 ├── requirements.txt
+├── data/
+├── figures/
+├── notebooks/
 ├── proposal/
 │   └── group-project-proposal.pdf
-├── data/
-│   ├── reddit_posts.csv
-│   ├── webmd_reviews.csv
-│   ├── news_articles.csv
-│   ├── public_processed.csv
-│   ├── media_processed.csv
-│   └── analysis_stats.json
-├── notebooks/
-│   ├── 01-data-collection.ipynb      # Scraping Reddit, WebMD, news APIs
-│   ├── 02-preprocessing.ipynb        # Text cleaning, tokenization, vectorization
-│   ├── 03-sentiment.ipynb            # VADER sentiment analysis + statistical tests
-│   ├── 04-associations.ipynb         # PMI and Lift word associations
-│   ├── 05-comparison.ipynb           # TF-IDF comparison, word clouds, side effects
-│   ├── 06-classification.ipynb       # Naive Bayes + KNN text classification
-│   └── 07-topic-modeling.ipynb       # LDA topic modeling + K-Means clustering
-├── figures/
-│   ├── sentiment_histograms.png
-│   ├── sentiment_boxplot.png
-│   ├── sentiment_pies.png
-│   ├── tfidf_comparison.png
-│   ├── wordclouds.png
-│   ├── mds_plot.png
-│   ├── side_effects.png
-│   ├── sentiment_timeline.png
-│   ├── knn_k_selection.png
-│   ├── classification_comparison.png
-│   ├── lda_topic_selection.png
-│   ├── topic_distributions.png
-│   └── kmeans_selection.png
 └── presentation/
-    ├── presentation.html
-    ├── presentation.pdf
     └── presentation.pptx
 ```
 
-## How to Run
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/othmane-zizi-pro/insy669-glp1-text-analytics.git
-cd insy669-glp1-text-analytics
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Download NLTK data
-python -c "import nltk; nltk.download('vader_lexicon'); nltk.download('punkt'); nltk.download('punkt_tab'); nltk.download('stopwords'); nltk.download('wordnet')"
-
-# 4. Run notebooks in order
-jupyter notebook notebooks/
-```
-
-## Key Findings
-
-1. **Sentiment Gap**: Public opinion shows more polarized sentiment (both highly positive and highly negative) compared to media's more neutral, measured tone.
-
-2. **Language Differences**: Public discourse focuses on personal experiences (weight loss numbers, side effects, costs), while media emphasizes clinical trials, market dynamics, and regulatory issues.
-
-3. **Side Effects**: Users frequently discuss nausea, constipation, and sulfur burps - side effects that receive less proportional coverage in media articles.
-
-4. **Cost Concerns**: Affordability and insurance coverage are dominant themes in public discussion but treated as secondary topics in media coverage.
-
-5. **Classifiability**: Naive Bayes and KNN classifiers can distinguish media from public text with high accuracy, confirming that the two corpora use fundamentally different language patterns.
-
-6. **Latent Topics**: LDA reveals distinct thematic structures in each corpus - public topics center on personal health journeys while media topics revolve around industry and clinical narratives. K-Means clustering naturally separates the two corpora.
-
 ## License
-
-This project was created for academic purposes as part of INSY 669 at McGill University.
+Created for academic purposes as part of INSY 669 at McGill University.

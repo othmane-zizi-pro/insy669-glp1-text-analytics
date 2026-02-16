@@ -12,3 +12,4 @@ jupyter>=1.0.0
 nbconvert>=7.0.0
 python-pptx>=0.6.21
 statsmodels>=0.14.0
+googlenewsdecoder>=0.1.7

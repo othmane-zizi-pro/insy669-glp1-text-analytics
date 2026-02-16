@@ -1,7 +1,10 @@
 """
-Run all analysis notebooks (02-07) as Python scripts to regenerate
-processed data, figures, and statistics with the new real data.
+Run the end-to-end analysis pipeline (notebook logic 02-09) to regenerate
+processed data, figures, and summary statistics from current data inputs.
 """
+import argparse
+import json
+import os
 import pandas as pd
 import numpy as np
 import re
@@ -10,10 +13,11 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.model_selection import cross_val_score, GridSearchCV
+from sklearn.model_selection import cross_val_score, GridSearchCV, StratifiedKFold
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+from sklearn.pipeline import Pipeline
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.cluster import KMeans
 from sklearn.manifold import MDS
@@ -25,9 +29,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from wordcloud import WordCloud
 from collections import Counter
-import json
 import warnings
-import os
+from analysis_utils import (
+    ensure_sentiment_columns,
+    parse_date_safe,
+    standardize_date_column,
+    validate_required_columns,
+)
 warnings.filterwarnings('ignore')
 
 # Download NLTK resources
@@ -46,6 +54,114 @@ plt.rcParams['savefig.dpi'] = 150
 plt.rcParams['savefig.bbox'] = 'tight'
 
 
+def build_parser():
+    parser = argparse.ArgumentParser(
+        description='Run full GLP-1 text analytics pipeline with configurable media text mode.'
+    )
+    parser.add_argument(
+        '--media-text-mode',
+        choices=['snippet', 'body', 'hybrid'],
+        default=os.environ.get('MEDIA_TEXT_MODE', 'hybrid'),
+        help='Media text strategy: snippet-only, body-only, or body-with-snippet-fallback.',
+    )
+    parser.add_argument(
+        '--media-body-min-tokens',
+        type=int,
+        default=80,
+        help='Minimum token threshold to treat `text_body` as usable in body/hybrid modes.',
+    )
+    parser.add_argument(
+        '--normalized-token-cap',
+        type=int,
+        default=40,
+        help='Token cap for the length-normalized robustness track.',
+    )
+    return parser
+
+
+def normalize_text_series(series):
+    return (
+        series.fillna('')
+        .astype(str)
+        .str.replace(r'\s+', ' ', regex=True)
+        .str.strip()
+    )
+
+
+def select_media_analysis_text(df_news, mode='hybrid', body_min_tokens=80):
+    """
+    Produce a backward-compatible `text` column for analysis while supporting:
+      - snippet: use title/description snippet only
+      - body: use only extracted body text (drops rows without usable body)
+      - hybrid: use body when available, else snippet fallback
+    """
+    out = df_news.copy()
+    if 'text_snippet' in out.columns:
+        snippet = normalize_text_series(out['text_snippet'])
+    elif 'text' in out.columns:
+        snippet = normalize_text_series(out['text'])
+        out['text_snippet'] = snippet
+    else:
+        raise ValueError("news_articles.csv must include `text` or `text_snippet`.")
+
+    if 'text_body' in out.columns:
+        body = normalize_text_series(out['text_body'])
+    else:
+        body = pd.Series([''] * len(out), index=out.index, dtype='object')
+        out['text_body'] = body
+
+    body_tokens = body.str.split().str.len()
+    has_body = body_tokens >= int(max(1, body_min_tokens))
+    total_docs = len(out)
+    docs_with_body = int(has_body.sum())
+    usable_body_coverage = (docs_with_body / total_docs) if total_docs else 0.0
+
+    if mode == 'snippet':
+        analysis_text = snippet
+        fallback_docs = total_docs
+    elif mode == 'hybrid':
+        analysis_text = pd.Series(np.where(has_body, body, snippet), index=out.index)
+        fallback_docs = int((~has_body).sum())
+    elif mode == 'body':
+        if docs_with_body == 0:
+            raise ValueError(
+                "media_text_mode=body selected, but no usable `text_body` rows were found. "
+                "Recollect with `python project_cli.py run-all --fetch-news-body` "
+                "or use --media-text-mode hybrid."
+            )
+        out = out.loc[has_body].copy()
+        analysis_text = body.loc[out.index]
+        body_tokens = body_tokens.loc[out.index]
+        has_body = has_body.loc[out.index]
+        fallback_docs = 0
+    else:
+        raise ValueError(f'Unsupported media text mode: {mode}')
+
+    out['text'] = normalize_text_series(analysis_text)
+    out['text_body_tokens'] = body_tokens.astype(int)
+    out['has_usable_text_body'] = has_body.astype(int)
+
+    selected_lens = out['text'].str.split().str.len()
+    media_text_stats = {
+        'mode': mode,
+        'body_min_tokens': int(max(1, body_min_tokens)),
+        'total_news_docs': int(total_docs),
+        'news_docs_with_usable_body': int(docs_with_body),
+        'usable_body_coverage': float(usable_body_coverage),
+        'news_docs_after_mode_filter': int(len(out)),
+        'fallback_to_snippet_docs': int(fallback_docs),
+        'selected_text_mean_tokens': float(selected_lens.mean()) if len(selected_lens) else 0.0,
+    }
+    return out, media_text_stats
+
+
+ARGS = build_parser().parse_args()
+MEDIA_TEXT_MODE = ARGS.media_text_mode
+MEDIA_BODY_MIN_TOKENS = int(max(1, ARGS.media_body_min_tokens))
+NORMALIZED_TOKEN_CAP = int(max(1, ARGS.normalized_token_cap))
+NORM_LABEL = f"Norm{NORMALIZED_TOKEN_CAP}"
+
+
 # =============================================================================
 # NOTEBOOK 02: PREPROCESSING
 # =============================================================================
@@ -57,10 +173,34 @@ df_reddit = pd.read_csv(f'{DATA_DIR}/reddit_posts.csv')
 df_webmd = pd.read_csv(f'{DATA_DIR}/webmd_reviews.csv')
 df_news = pd.read_csv(f'{DATA_DIR}/news_articles.csv')
 
+validate_required_columns(df_reddit, ['id', 'text', 'date'], 'reddit_posts.csv')
+validate_required_columns(df_webmd, ['id', 'text', 'date'], 'webmd_reviews.csv')
+validate_required_columns(df_news, ['id', 'date'], 'news_articles.csv')
+if 'text' not in df_news.columns and 'text_snippet' not in df_news.columns:
+    raise ValueError("news_articles.csv must include either `text` or `text_snippet`.")
+
+df_news, media_text_stats = select_media_analysis_text(
+    df_news,
+    mode=MEDIA_TEXT_MODE,
+    body_min_tokens=MEDIA_BODY_MIN_TOKENS,
+)
+print(
+    "Media text mode: "
+    f"{media_text_stats['mode']} (body_min_tokens={media_text_stats['body_min_tokens']}, "
+    f"usable_body={media_text_stats['news_docs_with_usable_body']}/{media_text_stats['total_news_docs']}, "
+    f"fallback_docs={media_text_stats['fallback_to_snippet_docs']}, "
+    f"selected_mean_tokens={media_text_stats['selected_text_mean_tokens']:.1f})"
+)
+
 # Filter WebMD to 2024 only (align all corpora to same time window)
-df_webmd['date'] = pd.to_datetime(df_webmd['date'])
-df_webmd = df_webmd[df_webmd['date'].dt.year == 2024].reset_index(drop=True)
+webmd_dates = parse_date_safe(df_webmd['date'])
+df_webmd = df_webmd[webmd_dates.dt.year == 2024].reset_index(drop=True)
 print(f"WebMD filtered to 2024: {len(df_webmd)} reviews")
+
+# Normalize source date columns to ISO strings for downstream consistency.
+df_reddit = standardize_date_column(df_reddit, 'date')
+df_webmd = standardize_date_column(df_webmd, 'date')
+df_news = standardize_date_column(df_news, 'date')
 
 # Create unified corpora
 df_public = pd.concat([
@@ -68,10 +208,29 @@ df_public = pd.concat([
     df_webmd[['id', 'text', 'date']].assign(source='webmd')
 ], ignore_index=True)
 
-df_media = df_news[['id', 'text', 'date']].assign(source='news')
+media_cols = ['id', 'text', 'date']
+media_optional_cols = [
+    'text_snippet',
+    'text_body',
+    'text_body_tokens',
+    'has_usable_text_body',
+    'article_url',
+    'rss_link',
+    'title',
+    'description',
+]
+for col in media_optional_cols:
+    if col in df_news.columns:
+        media_cols.append(col)
+df_media = df_news[media_cols].assign(source='news')
+
+df_public = standardize_date_column(df_public, 'date')
+df_media = standardize_date_column(df_media, 'date')
 
 print(f"Public corpus: {len(df_public)} documents")
 print(f"Media corpus: {len(df_media)} documents")
+validate_required_columns(df_public, ['id', 'text', 'date', 'source'], 'Public corpus')
+validate_required_columns(df_media, ['id', 'text', 'date', 'source'], 'Media corpus')
 
 # Preprocessing pipeline
 stop_words = set(stopwords.words('english'))
@@ -87,8 +246,17 @@ def preprocess(text):
     return ' '.join(tokens)
 
 
+def first_n_tokens(text, n=NORMALIZED_TOKEN_CAP):
+    tokens = str(text).split()
+    return ' '.join(tokens[:n])
+
+
 df_public['clean'] = df_public['text'].apply(preprocess)
 df_media['clean'] = df_media['text'].apply(preprocess)
+df_public['clean_norm40'] = df_public['clean'].apply(first_n_tokens)
+df_media['clean_norm40'] = df_media['clean'].apply(first_n_tokens)
+validate_required_columns(df_public, ['clean', 'clean_norm40'], 'Public corpus after preprocessing')
+validate_required_columns(df_media, ['clean', 'clean_norm40'], 'Media corpus after preprocessing')
 
 df_public['token_count'] = df_public['clean'].apply(lambda x: len(x.split()))
 df_media['token_count'] = df_media['clean'].apply(lambda x: len(x.split()))
@@ -114,6 +282,8 @@ sia = SentimentIntensityAnalyzer()
 
 df_public['sentiment'] = df_public['text'].apply(lambda x: sia.polarity_scores(str(x))['compound'])
 df_media['sentiment'] = df_media['text'].apply(lambda x: sia.polarity_scores(str(x))['compound'])
+df_public['compound'] = df_public['sentiment']
+df_media['compound'] = df_media['sentiment']
 
 
 def classify_sentiment(score):
@@ -126,6 +296,11 @@ def classify_sentiment(score):
 
 df_public['sentiment_label'] = df_public['sentiment'].apply(classify_sentiment)
 df_media['sentiment_label'] = df_media['sentiment'].apply(classify_sentiment)
+
+df_public = ensure_sentiment_columns(df_public)
+df_media = ensure_sentiment_columns(df_media)
+df_public = standardize_date_column(df_public, 'date')
+df_media = standardize_date_column(df_media, 'date')
 
 # Save with sentiment
 df_public.to_csv(f'{DATA_DIR}/public_with_sentiment.csv', index=False)
@@ -366,6 +541,36 @@ plt.savefig(f'{FIG_DIR}/tfidf_comparison.png')
 plt.close()
 print("Saved tfidf_comparison.png")
 
+# Length-normalized TF-IDF comparison (capped token windows per doc)
+tfidf_pub_norm = TfidfVectorizer(max_features=5000, ngram_range=(1, 2), min_df=5)
+tfidf_med_norm = TfidfVectorizer(max_features=5000, ngram_range=(1, 2), min_df=3)
+pub_matrix_norm = tfidf_pub_norm.fit_transform(df_public['clean_norm40'])
+med_matrix_norm = tfidf_med_norm.fit_transform(df_media['clean_norm40'])
+pub_means_norm = np.array(pub_matrix_norm.mean(axis=0)).flatten()
+med_means_norm = np.array(med_matrix_norm.mean(axis=0)).flatten()
+pub_top_idx_norm = pub_means_norm.argsort()[-20:][::-1]
+med_top_idx_norm = med_means_norm.argsort()[-20:][::-1]
+pub_terms_norm = [(tfidf_pub_norm.get_feature_names_out()[i], pub_means_norm[i]) for i in pub_top_idx_norm]
+med_terms_norm = [(tfidf_med_norm.get_feature_names_out()[i], med_means_norm[i]) for i in med_top_idx_norm]
+
+fig, axes = plt.subplots(1, 2, figsize=(16, 8))
+words_pn, scores_pn = zip(*pub_terms_norm)
+words_mn, scores_mn = zip(*med_terms_norm)
+axes[0].barh(range(20), scores_pn, color='#1976D2', alpha=0.85)
+axes[0].set_yticks(range(20))
+axes[0].set_yticklabels(words_pn)
+axes[0].set_title(f'Public ({NORM_LABEL}): Top TF-IDF Terms', fontweight='bold')
+axes[0].invert_yaxis()
+axes[1].barh(range(20), scores_mn, color='#EF6C00', alpha=0.85)
+axes[1].set_yticks(range(20))
+axes[1].set_yticklabels(words_mn)
+axes[1].set_title(f'Media ({NORM_LABEL}): Top TF-IDF Terms', fontweight='bold')
+axes[1].invert_yaxis()
+plt.tight_layout()
+plt.savefig(f'{FIG_DIR}/tfidf_comparison_normalized.png')
+plt.close()
+print("Saved tfidf_comparison_normalized.png")
+
 # Word Clouds
 fig, axes = plt.subplots(1, 2, figsize=(16, 7))
 pub_text = ' '.join(df_public['clean'].dropna())
@@ -414,6 +619,48 @@ plt.savefig(f'{FIG_DIR}/side_effects.png')
 plt.close()
 print("Saved side_effects.png")
 
+# Length-normalized side-effect metrics: mentions per 1k tokens + doc prevalence.
+pub_docs_norm = df_public['clean_norm40'].fillna('').str.lower()
+med_docs_norm = df_media['clean_norm40'].fillna('').str.lower()
+pub_total_tokens_norm = max(pub_docs_norm.str.split().str.len().sum(), 1)
+med_total_tokens_norm = max(med_docs_norm.str.split().str.len().sum(), 1)
+
+side_effect_rates_public = {}
+side_effect_rates_media = {}
+side_effect_prev_public = {}
+side_effect_prev_media = {}
+se_norm_rows = []
+for se in side_effects:
+    escaped = re.escape(se)
+    pub_mentions = pub_docs_norm.str.count(escaped).sum()
+    med_mentions = med_docs_norm.str.count(escaped).sum()
+    pub_rate = float(pub_mentions) / pub_total_tokens_norm * 1000.0
+    med_rate = float(med_mentions) / med_total_tokens_norm * 1000.0
+    pub_prev = float(pub_docs_norm.str.contains(escaped, regex=True).mean())
+    med_prev = float(med_docs_norm.str.contains(escaped, regex=True).mean())
+
+    side_effect_rates_public[se] = round(pub_rate, 6)
+    side_effect_rates_media[se] = round(med_rate, 6)
+    side_effect_prev_public[se] = round(pub_prev, 6)
+    side_effect_prev_media[se] = round(med_prev, 6)
+    se_norm_rows.append({'side_effect': se, 'public_rate': pub_rate, 'media_rate': med_rate})
+
+df_se_norm = pd.DataFrame(se_norm_rows).sort_values('public_rate', ascending=False)
+fig, ax = plt.subplots(figsize=(13, 7))
+x = np.arange(len(df_se_norm))
+width = 0.35
+ax.bar(x - width / 2, df_se_norm['public_rate'], width, label='Public', color='#1E88E5', alpha=0.8)
+ax.bar(x + width / 2, df_se_norm['media_rate'], width, label='Media', color='#FB8C00', alpha=0.8)
+ax.set_xticks(x)
+ax.set_xticklabels(df_se_norm['side_effect'], rotation=45, ha='right')
+ax.set_ylabel(f'Mentions per 1,000 Tokens ({NORM_LABEL})')
+ax.set_title('Side Effects (Length-Normalized Rate): Public vs Media', fontweight='bold')
+ax.legend()
+plt.tight_layout()
+plt.savefig(f'{FIG_DIR}/side_effects_normalized_rate.png')
+plt.close()
+print("Saved side_effects_normalized_rate.png")
+
 # Three-source side effects breakdown
 reddit_text_lower = ' '.join(df_public[df_public['source'] == 'reddit']['clean'].dropna()).lower()
 webmd_text_lower = ' '.join(df_public[df_public['source'] == 'webmd']['clean'].dropna()).lower()
@@ -446,8 +693,8 @@ plt.close()
 print("Saved side_effects_3source.png")
 
 # Temporal Sentiment (with per-source lines)
-df_public['month'] = pd.to_datetime(df_public['date'], errors='coerce').dt.to_period('M')
-df_media['month'] = pd.to_datetime(df_media['date'], errors='coerce').dt.to_period('M')
+df_public['month'] = parse_date_safe(df_public['date']).dt.to_period('M')
+df_media['month'] = parse_date_safe(df_media['date']).dt.to_period('M')
 
 pub_monthly = df_public.groupby('month')['sentiment'].mean()
 med_monthly = df_media.groupby('month')['sentiment'].mean()
@@ -483,6 +730,13 @@ med_vec = np.asarray(combined_matrix[len(df_public):].mean(axis=0))
 cos_sim_score = cosine_similarity(pub_vec, med_vec)[0][0]
 print(f"Cosine similarity between corpora: {cos_sim_score:.3f}")
 
+combined_tfidf_norm = TfidfVectorizer(max_features=5000, min_df=3)
+combined_matrix_norm = combined_tfidf_norm.fit_transform(pd.concat([df_public['clean_norm40'], df_media['clean_norm40']]))
+pub_vec_norm = np.asarray(combined_matrix_norm[:len(df_public)].mean(axis=0))
+med_vec_norm = np.asarray(combined_matrix_norm[len(df_public):].mean(axis=0))
+cos_sim_score_norm = cosine_similarity(pub_vec_norm, med_vec_norm)[0][0]
+print(f"Cosine similarity ({NORM_LABEL}) between corpora: {cos_sim_score_norm:.3f}")
+
 
 # =============================================================================
 # NOTEBOOK 06: CLASSIFICATION
@@ -494,35 +748,46 @@ print("=" * 60)
 # Prepare data
 all_texts = pd.concat([df_public['clean'], df_media['clean']])
 all_labels = np.array(['public'] * len(df_public) + ['media'] * len(df_media))
-
-clf_tfidf = TfidfVectorizer(max_features=5000, ngram_range=(1, 2), min_df=3)
-X = clf_tfidf.fit_transform(all_texts)
 y = all_labels
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-# Naive Bayes with GridSearchCV
-nb_params = {'alpha': [0.01, 0.1, 0.5, 1.0, 2.0]}
-nb_grid = GridSearchCV(MultinomialNB(), nb_params, cv=5, scoring='accuracy')
-nb_grid.fit(X, y)
+nb_pipeline = Pipeline([
+    ('vectorizer', TfidfVectorizer(max_features=5000, ngram_range=(1, 2), min_df=3)),
+    ('classifier', MultinomialNB()),
+])
+nb_params = {'classifier__alpha': [0.01, 0.1, 0.5, 1.0, 2.0]}
+nb_grid = GridSearchCV(nb_pipeline, nb_params, cv=cv, scoring='accuracy', n_jobs=-1)
+nb_grid.fit(all_texts, y)
 nb_best = nb_grid.best_estimator_
 nb_score = nb_grid.best_score_
-print(f"Naive Bayes best alpha: {nb_grid.best_params_['alpha']}, CV accuracy: {nb_score:.4f}")
+print(f"Naive Bayes best alpha: {nb_grid.best_params_['classifier__alpha']}, CV accuracy: {nb_score:.4f}")
 
-# KNN with k selection
-k_range = range(3, 21, 2)
+knn_pipeline = Pipeline([
+    ('vectorizer', TfidfVectorizer(max_features=5000, ngram_range=(1, 2), min_df=3)),
+    ('classifier', KNeighborsClassifier(metric='cosine')),
+])
+k_candidates = list(range(3, 21, 2))
+knn_grid = GridSearchCV(
+    knn_pipeline,
+    {'classifier__n_neighbors': k_candidates},
+    cv=cv,
+    scoring='accuracy',
+    n_jobs=-1,
+)
+knn_grid.fit(all_texts, y)
+
+best_k = int(knn_grid.best_params_['classifier__n_neighbors'])
+knn_best_score = knn_grid.best_score_
 knn_scores = []
-for k in k_range:
-    knn = KNeighborsClassifier(n_neighbors=k)
-    score = cross_val_score(knn, X, y, cv=5, scoring='accuracy').mean()
-    knn_scores.append(score)
-
-best_k_idx = np.argmax(knn_scores)
-best_k = list(k_range)[best_k_idx]
-knn_best_score = knn_scores[best_k_idx]
+for k in k_candidates:
+    k_mask = knn_grid.cv_results_['param_classifier__n_neighbors'] == k
+    k_score = float(np.max(np.array(knn_grid.cv_results_['mean_test_score'])[k_mask]))
+    knn_scores.append(k_score)
 print(f"KNN best k: {best_k}, CV accuracy: {knn_best_score:.4f}")
 
 # Figure: KNN k selection
 fig, ax = plt.subplots(figsize=(10, 6))
-ax.plot(list(k_range), knn_scores, 'o-', color='#2196F3', linewidth=2)
+ax.plot(k_candidates, knn_scores, 'o-', color='#2196F3', linewidth=2)
 ax.axvline(best_k, color='red', linestyle='--', label=f'Best k={best_k}')
 ax.set_xlabel('k (Number of Neighbors)')
 ax.set_ylabel('Cross-Validation Accuracy')
@@ -550,16 +815,60 @@ plt.close()
 print("Saved classification_comparison.png")
 
 # Top discriminative features
-feature_names = clf_tfidf.get_feature_names_out()
-nb_log_probs = nb_best.feature_log_prob_
-media_idx = list(nb_best.classes_).index('media')
-public_idx = list(nb_best.classes_).index('public')
+nb_vectorizer = nb_best.named_steps['vectorizer']
+nb_classifier = nb_best.named_steps['classifier']
+feature_names = nb_vectorizer.get_feature_names_out()
+nb_log_probs = nb_classifier.feature_log_prob_
+media_idx = list(nb_classifier.classes_).index('media')
+public_idx = list(nb_classifier.classes_).index('public')
 log_ratio = nb_log_probs[public_idx] - nb_log_probs[media_idx]
 
 top_public_features = [feature_names[i] for i in log_ratio.argsort()[-10:][::-1]]
 top_media_features = [feature_names[i] for i in log_ratio.argsort()[:10]]
 print(f"Top public-indicative features: {top_public_features}")
 print(f"Top media-indicative features: {top_media_features}")
+
+# Length-normalized classification for confound robustness checks
+all_texts_norm = pd.concat([df_public['clean_norm40'], df_media['clean_norm40']])
+
+nb_grid_norm = GridSearchCV(nb_pipeline, nb_params, cv=cv, scoring='accuracy', n_jobs=-1)
+nb_grid_norm.fit(all_texts_norm, y)
+nb_score_norm = nb_grid_norm.best_score_
+
+knn_grid_norm = GridSearchCV(
+    knn_pipeline,
+    {'classifier__n_neighbors': k_candidates},
+    cv=cv,
+    scoring='accuracy',
+    n_jobs=-1,
+)
+knn_grid_norm.fit(all_texts_norm, y)
+knn_best_score_norm = knn_grid_norm.best_score_
+best_k_norm = int(knn_grid_norm.best_params_['classifier__n_neighbors'])
+
+fig, ax = plt.subplots(figsize=(8, 5))
+models_norm = [f'Naive Bayes ({NORM_LABEL})', f'KNN ({NORM_LABEL}, k={best_k_norm})']
+scores_norm = [nb_score_norm, knn_best_score_norm]
+bars = ax.bar(models_norm, scores_norm, color=['#1E88E5', '#FB8C00'], alpha=0.85, width=0.6)
+ax.set_ylabel('Cross-Validation Accuracy')
+ax.set_title('Classification Performance (Length-Normalized)', fontweight='bold')
+ax.set_ylim(0.5, 1.0)
+for bar, score in zip(bars, scores_norm):
+    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.01,
+            f'{score:.3f}', ha='center', fontsize=12, fontweight='bold')
+plt.tight_layout()
+plt.savefig(f'{FIG_DIR}/classification_comparison_normalized.png')
+plt.close()
+print("Saved classification_comparison_normalized.png")
+
+print(f"\nRobustness check (full vs {NORM_LABEL}):")
+print(f"  Cosine similarity: {cos_sim_score:.3f} -> {cos_sim_score_norm:.3f}")
+print(f"  NB CV accuracy:    {nb_score:.4f} -> {nb_score_norm:.4f}")
+print(f"  KNN CV accuracy:   {knn_best_score:.4f} -> {knn_best_score_norm:.4f}")
+if nb_score_norm > 0.8 and knn_best_score_norm > 0.8:
+    print("  Interpretation: key corpus separability remains robust under length normalization.")
+else:
+    print("  Interpretation: conclusions are sensitive to text length normalization.")
 
 
 # =============================================================================
@@ -835,8 +1144,8 @@ print("=" * 60)
 from statsmodels.tsa.stattools import adfuller, grangercausalitytests
 
 # Weekly sentiment time series
-df_public['date_parsed'] = pd.to_datetime(df_public['date'], errors='coerce')
-df_media['date_parsed'] = pd.to_datetime(df_media['date'], errors='coerce')
+df_public['date_parsed'] = parse_date_safe(df_public['date'])
+df_media['date_parsed'] = parse_date_safe(df_media['date'])
 
 df_public['week'] = df_public['date_parsed'].dt.to_period('W')
 df_media['week'] = df_media['date_parsed'].dt.to_period('W')
@@ -1023,6 +1332,13 @@ print("SAVING ANALYSIS STATS")
 print("=" * 60)
 
 analysis_stats = {
+    "media_text_mode": MEDIA_TEXT_MODE,
+    "media_body_min_tokens": MEDIA_BODY_MIN_TOKENS,
+    "normalized_token_cap": NORMALIZED_TOKEN_CAP,
+    "media_docs_with_usable_body": media_text_stats["news_docs_with_usable_body"],
+    "media_body_coverage": round(media_text_stats["usable_body_coverage"], 4),
+    "media_docs_after_mode_filter": media_text_stats["news_docs_after_mode_filter"],
+    "media_docs_fallback_to_snippet": media_text_stats["fallback_to_snippet_docs"],
     "public_mean_sentiment": round(df_public['sentiment'].mean(), 4),
     "media_mean_sentiment": round(df_media['sentiment'].mean(), 4),
     "reddit_mean_sentiment": round(df_reddit_sent.mean(), 4),
@@ -1033,6 +1349,7 @@ analysis_stats = {
     "cohens_d": round(cohens_d, 3),
     "pairwise_mannwhitney": pairwise_results,
     "cosine_similarity": round(cos_sim_score, 3),
+    "cosine_similarity_normalized": round(cos_sim_score_norm, 3),
     "public_n": len(df_public),
     "media_n": len(df_media),
     "reddit_n": len(df_reddit),
@@ -1041,20 +1358,30 @@ analysis_stats = {
     "public_sentiment_dist": pub_dist,
     "media_sentiment_dist": med_dist,
     "nb_accuracy": round(nb_score, 4),
-    "nb_best_alpha": nb_grid.best_params_['alpha'],
+    "nb_best_alpha": nb_grid.best_params_['classifier__alpha'],
+    "nb_accuracy_normalized": round(nb_score_norm, 4),
     "knn_accuracy": round(knn_best_score, 4),
     "knn_best_k": best_k,
+    "knn_accuracy_normalized": round(knn_best_score_norm, 4),
     "kmeans_purity": round(purity, 3),
     "top_public_features": top_public_features,
     "top_media_features": top_media_features,
     "aspect_sentiment": aspect_means.to_dict() if 'public' in aspect_means.columns else {},
     "aspect_stats": aspect_stats,
-    "discrepancy_classifier_accuracy": round(lr_mean_acc, 4) if lr_mean_acc else None,
+    "discrepancy_classifier_accuracy": round(lr_mean_acc, 4) if lr_mean_acc is not None else None,
     "discrepancy_classifier_coefficients": coef_importance,
     "granger_results": granger_results,
     "crosscorrelation_peak_lag": best_lag,
-    "crosscorrelation_peak_r": round(best_cc, 4) if best_cc else None,
-    "volume_correlation": round(vol_corr, 4) if vol_corr else None,
+    "crosscorrelation_peak_r": round(best_cc, 4) if best_cc is not None else None,
+    "volume_correlation": round(vol_corr, 4) if vol_corr is not None else None,
+    "side_effect_rates_per_1k_tokens": {
+        "public": side_effect_rates_public,
+        "media": side_effect_rates_media,
+    },
+    "side_effect_doc_prevalence": {
+        "public": side_effect_prev_public,
+        "media": side_effect_prev_media,
+    },
 }
 
 with open(f'{DATA_DIR}/analysis_stats.json', 'w') as f:

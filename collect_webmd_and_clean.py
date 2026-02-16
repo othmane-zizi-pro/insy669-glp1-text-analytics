@@ -83,7 +83,29 @@ def clean_news():
         text = re.sub(r'\s+', ' ', text).strip()
         return text
 
-    df['text'] = df['text'].apply(clean_html)
+    if 'text_snippet' in df.columns:
+        df['text_snippet'] = df['text_snippet'].apply(clean_html)
+    if 'text_body' in df.columns:
+        df['text_body'] = df['text_body'].apply(clean_html)
+    if 'description' in df.columns:
+        df['description'] = df['description'].apply(clean_html)
+    if 'text' in df.columns:
+        df['text'] = df['text'].apply(clean_html)
+
+    # Backward/forward compatibility between legacy and enriched schemas.
+    if 'text_snippet' not in df.columns and 'text' in df.columns:
+        df['text_snippet'] = df['text']
+    if 'text' not in df.columns and 'text_snippet' in df.columns:
+        df['text'] = df['text_snippet']
+
+    if 'text_body' in df.columns:
+        df['body_token_count'] = (
+            df['text_body']
+            .fillna('')
+            .astype(str)
+            .str.split()
+            .str.len()
+        )
 
     # Remove articles with very short text (just titles with no substance)
     df = df[df['text'].str.len() >= 30].reset_index(drop=True)
