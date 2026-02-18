@@ -6,6 +6,16 @@
 ![NLTK](https://img.shields.io/badge/NLTK-3.8%2B-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
+## Team Members
+
+| Name | Student ID |
+|------|-----------|
+| Vasilis Christopoulos | 261278396 |
+| Hugo Guideau | 261261108 |
+| Saksi Khosla | 261284778 |
+| Mustafa Yousuf | 261265412 |
+| Othmane Zizi | 261255341 |
+
 ## Project Overview
 This project compares language and sentiment in:
 - **Public discourse**: Reddit + WebMD reviews
@@ -171,6 +181,20 @@ Notable normalized outputs:
 └── presentation/
     └── presentation.pptx
 ```
+
+## Key Findings
+
+1. **Sentiment Gap**: Public opinion shows more polarized sentiment (both highly positive and highly negative) compared to media's more neutral, measured tone.
+
+2. **Language Differences**: Public discourse focuses on personal experiences (weight loss numbers, side effects, costs), while media emphasizes clinical trials, market dynamics, and regulatory issues.
+
+3. **Side Effects**: Users frequently discuss nausea, constipation, and sulfur burps - side effects that receive less proportional coverage in media articles.
+
+4. **Cost Concerns**: Affordability and insurance coverage are dominant themes in public discussion but treated as secondary topics in media coverage.
+
+5. **Classifiability**: Naive Bayes and KNN classifiers can distinguish media from public text with high accuracy, confirming that the two corpora use fundamentally different language patterns.
+
+6. **Latent Topics**: LDA reveals distinct thematic structures in each corpus - public topics center on personal health journeys while media topics revolve around industry and clinical narratives. K-Means clustering naturally separates the two corpora.
 
 ## License
 Created for academic purposes as part of INSY 669 at McGill University.
