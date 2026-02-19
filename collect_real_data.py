@@ -7,6 +7,7 @@ import argparse
 import os
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
 import pandas as pd
@@ -30,6 +31,7 @@ BEFORE_TS = int(datetime(2024, 11, 30).timestamp())
 
 MIN_BODY_TOKENS_DEFAULT = 80
 MAX_BODY_CHARS = 12000
+MAX_FETCH_BYTES = 600000
 
 
 def normalize_whitespace(text):
@@ -80,12 +82,32 @@ def extract_article_body(article_url, timeout=15):
         return ''
 
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=timeout)
+        resp = requests.get(url, headers=HEADERS, timeout=timeout, stream=True)
         resp.raise_for_status()
     except Exception:
         return ''
 
-    soup = BeautifulSoup(resp.text, 'lxml')
+    chunks = []
+    total = 0
+    try:
+        for chunk in resp.iter_content(chunk_size=16384):
+            if not chunk:
+                continue
+            chunks.append(chunk)
+            total += len(chunk)
+            if total >= MAX_FETCH_BYTES:
+                break
+    except Exception:
+        return ''
+    finally:
+        resp.close()
+
+    try:
+        html = b''.join(chunks).decode(resp.encoding or 'utf-8', errors='ignore')
+    except Exception:
+        return ''
+
+    soup = BeautifulSoup(html, 'lxml')
 
     # Remove obvious non-content nodes before extraction.
     for tag in soup(['script', 'style', 'noscript', 'svg', 'footer', 'nav', 'aside', 'form', 'header']):
@@ -306,6 +328,30 @@ def collect_webmd():
         print(f"    Collected {sum(1 for r in all_reviews if r['drug'] == drug_name)} reviews for {drug_name}")
 
     df = pd.DataFrame(all_reviews)
+
+    # Fallback for upstream WebMD endpoint instability.
+    # If live scraping yields nothing, recover previously collected WebMD rows
+    # from the local processed corpus so the public corpus remains represented.
+    if df.empty:
+        fallback_path = os.path.join(DATA_DIR, 'public_processed.csv')
+        if os.path.exists(fallback_path):
+            try:
+                fallback_df = pd.read_csv(fallback_path)
+                if {'id', 'text', 'date', 'source'}.issubset(fallback_df.columns):
+                    fallback_webmd = fallback_df[fallback_df['source'] == 'webmd'][['id', 'text', 'date']].copy()
+                    if not fallback_webmd.empty:
+                        fallback_webmd['source'] = 'webmd'
+                        fallback_webmd['drug'] = 'Unknown'
+                        fallback_webmd['rating'] = ''
+                        fallback_webmd['condition'] = ''
+                        df = fallback_webmd[['id', 'source', 'drug', 'text', 'rating', 'date', 'condition']].copy()
+                        print(
+                            "  [WARN] Live WebMD scraping returned 0 rows; "
+                            "reused webmd rows from data/public_processed.csv fallback."
+                        )
+            except Exception as e:
+                print(f"  [WARN] WebMD fallback load failed: {e}")
+
     out_path = os.path.join(DATA_DIR, 'webmd_reviews.csv')
     df.to_csv(out_path, index=False)
     print(f"  Saved {len(df)} WebMD reviews to {out_path}")
@@ -395,19 +441,14 @@ def collect_news(fetch_body=False, body_timeout=15, min_body_tokens=MIN_BODY_TOK
 
             link_el = item.find('link')
             rss_link = link_el.get_text(strip=True) if link_el else ''
-            article_url = decode_news_url(rss_link) if fetch_body else normalize_whitespace(rss_link)
+            # Decode in a batched concurrent pass to avoid serial per-item latency.
+            article_url = normalize_whitespace(rss_link)
 
             # Combine title and description
             text_snippet = f"{title_text}. {desc_text}" if desc_text else title_text
             text_snippet = normalize_whitespace(text_snippet)
             text_body = ''
             body_tokens = 0
-            if fetch_body and article_url:
-                body_attempts += 1
-                text_body = normalize_whitespace(extract_article_body(article_url, timeout=body_timeout))
-                body_tokens = len(text_body.split()) if text_body else 0
-                if body_tokens >= min_body_tokens:
-                    body_success += 1
 
             # Determine drug mentioned
             text_lower = text_snippet.lower()
@@ -448,6 +489,65 @@ def collect_news(fetch_body=False, body_timeout=15, min_body_tokens=MIN_BODY_TOK
             article_id += 1
 
         time.sleep(1)
+
+    if fetch_body and all_articles:
+        print(f"  Decoding {len(all_articles)} Google RSS links concurrently...")
+
+        def decode_job(idx, rss):
+            return idx, normalize_whitespace(decode_news_url(rss))
+
+        decoded_done = 0
+        with ThreadPoolExecutor(max_workers=12) as pool:
+            decode_futures = {
+                pool.submit(decode_job, idx, article.get('rss_link', '')): idx
+                for idx, article in enumerate(all_articles)
+            }
+            for fut in as_completed(decode_futures):
+                idx = decode_futures[fut]
+                try:
+                    _, decoded_url = fut.result()
+                except Exception:
+                    decoded_url = normalize_whitespace(all_articles[idx].get('rss_link', ''))
+                all_articles[idx]['article_url'] = decoded_url
+                decoded_done += 1
+                if decoded_done % 100 == 0 or decoded_done == len(all_articles):
+                    print(f"    Decode progress: {decoded_done}/{len(all_articles)}")
+
+        print(f"  Extracting article bodies concurrently for {len(all_articles)} articles...")
+
+        def fetch_body_job(idx, url):
+            if not url:
+                return idx, '', 0
+            body = normalize_whitespace(extract_article_body(url, timeout=body_timeout))
+            tokens = len(body.split()) if body else 0
+            return idx, body, tokens
+
+        completed = 0
+        max_workers = 12
+        with ThreadPoolExecutor(max_workers=max_workers) as pool:
+            futures = {
+                pool.submit(fetch_body_job, idx, article.get('article_url', '')): idx
+                for idx, article in enumerate(all_articles)
+            }
+            for fut in as_completed(futures):
+                idx = futures[fut]
+                try:
+                    _, text_body, body_tokens = fut.result()
+                except Exception:
+                    text_body, body_tokens = '', 0
+
+                all_articles[idx]['text_body'] = text_body
+                all_articles[idx]['body_token_count'] = body_tokens
+                body_attempts += 1
+                if body_tokens >= min_body_tokens:
+                    body_success += 1
+
+                completed += 1
+                if completed % 100 == 0 or completed == len(all_articles):
+                    print(
+                        f"    Body extraction progress: {completed}/{len(all_articles)} "
+                        f"(usable={body_success})"
+                    )
 
     df = pd.DataFrame(all_articles)
     out_path = os.path.join(DATA_DIR, 'news_articles.csv')

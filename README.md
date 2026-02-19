@@ -51,6 +51,7 @@ That's it. When step 4 finishes you will see updated outputs in `data/`, `figure
 | Sentiment data | `data/public_with_sentiment.csv`, `data/media_with_sentiment.csv` | Documents with VADER scores |
 | Statistics JSON | `data/analysis_stats.json` | Every metric referenced in the report (sentiment means, p-values, accuracies, etc.) |
 | Report | `report/report.pdf`, `report/report.docx` | 2-page summary with figures and tables |
+| Report v2 | `report/report_v2.pdf`, `report/report_v2.tex` | Fresh-hybrid update based on the latest validated recollection snapshot |
 
 ---
 
@@ -65,9 +66,9 @@ That's it. When step 4 finishes you will see updated outputs in `data/`, `figure
 ├── README.md
 │
 ├── data/                     ← Raw + processed datasets (all included)
-│   ├── reddit_posts.csv          3,246 Reddit posts
-│   ├── webmd_reviews.csv         1,000 WebMD reviews (102 after 2024 filter)
-│   ├── news_articles.csv         634 Google News articles
+│   ├── reddit_posts.csv          1,184 Reddit posts
+│   ├── webmd_reviews.csv         102 WebMD reviews
+│   ├── news_articles.csv         647 Google News articles
 │   ├── public_processed.csv      Preprocessed public corpus
 │   ├── media_processed.csv       Preprocessed media corpus
 │   ├── *_with_sentiment.csv      Corpora with VADER scores
@@ -90,6 +91,8 @@ That's it. When step 4 finishes you will see updated outputs in `data/`, `figure
     ├── report.tex                LaTeX source
     ├── report.pdf                Compiled PDF
     ├── report.docx               Word version
+    ├── report_v2.tex             LaTeX source (fresh hybrid update)
+    ├── report_v2.pdf             Compiled PDF (fresh hybrid update)
     └── generate_docx.py          Script that builds the DOCX
 ```
 
@@ -101,9 +104,9 @@ That's it. When step 4 finishes you will see updated outputs in `data/`, `figure
 
 | Source | Corpus | n | Period | Collection |
 |--------|--------|---|--------|------------|
-| Reddit (r/Ozempic, r/Semaglutide, r/WegovyWeightLoss) | Public | 3,246 | Jan–Nov 2024 | Arctic Shift API |
+| Reddit (r/Ozempic, r/Semaglutide, r/WegovyWeightLoss) | Public | 1,184 | Jan–Nov 2024 | Arctic Shift API |
 | WebMD patient reviews | Public | 102 (after 2024 filter) | 2024 | Web scraping |
-| Google News RSS | Media | 634 | Jan–Nov 2024 | RSS + URL decoding |
+| Google News RSS | Media | 647 | Jan–Nov 2024 | RSS + URL decoding |
 
 ### Analysis Stages
 
@@ -141,12 +144,12 @@ Every metric is computed on both full text and a 40-token-capped version (`clean
 
 | Finding | Evidence |
 |---------|----------|
-| **Sentiment gap** | Public +0.121 vs. media −0.137 (t = 9.43, p < 0.001, Cohen's d = 0.44) |
-| **High classifiability** | Naive Bayes 97.6%, KNN 96.7% — stable under length normalisation |
-| **Side-effect coverage gap** | Nausea, constipation, anxiety discussed 4–10x more by patients than media |
-| **Aspect discrepancy** | Largest gaps in mental health (0.63) and access (0.55) |
-| **No temporal causation** | Granger tests non-significant in both directions |
-| **Natural clustering** | K-Means (k=2) purity 84.1% without supervision |
+| **Sentiment contrast** | Public +0.1117 vs. media +0.1905 (t = -2.301, p = 0.0215, Cohen's d = -0.108) |
+| **High classifiability** | Naive Bayes 97.83%, KNN 95.50% (normalized: 97.57% / 97.10%) |
+| **Side-effect coverage gap** | Public mention prevalence exceeds media for nausea (8.4x), constipation (17.6x), and anxiety (3.0x) |
+| **Aspect discrepancy** | Strongest public-minus-media gaps: cost (-0.187), dosage (-0.175), side effects (-0.174) |
+| **No temporal causation** | Granger best p-values: media->public 0.7672, public->media 0.5183 (both non-significant) |
+| **Natural clustering** | K-Means (k=2) purity 89.8% without supervision |
 
 ---
 
