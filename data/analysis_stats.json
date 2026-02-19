@@ -1,248 +1,248 @@
 {
   "media_text_mode": "hybrid",
-  "media_body_min_tokens": 80,
+  "media_body_min_tokens": 60,
   "normalized_token_cap": 40,
-  "media_docs_with_usable_body": 0,
-  "media_body_coverage": 0.0,
-  "media_docs_after_mode_filter": 634,
-  "media_docs_fallback_to_snippet": 634,
-  "public_mean_sentiment": 0.1212,
-  "media_mean_sentiment": -0.1365,
-  "reddit_mean_sentiment": 0.1347,
+  "media_docs_with_usable_body": 450,
+  "media_body_coverage": 0.6955,
+  "media_docs_after_mode_filter": 647,
+  "media_docs_fallback_to_snippet": 197,
+  "public_mean_sentiment": 0.1117,
+  "media_mean_sentiment": 0.1905,
+  "reddit_mean_sentiment": 0.1479,
   "webmd_mean_sentiment": -0.3077,
-  "news_mean_sentiment": -0.1365,
-  "t_statistic": 9.43,
-  "p_value": 0.0,
-  "cohens_d": 0.436,
+  "news_mean_sentiment": 0.1905,
+  "t_statistic": -2.301,
+  "p_value": 0.021516,
+  "cohens_d": -0.108,
   "pairwise_mannwhitney": {
     "Reddit_vs_WebMD": {
-      "U": 228652.5,
+      "U": 83851.5,
       "p": 0.0
     },
     "Reddit_vs_News": {
-      "U": 1287452.5,
-      "p": 0.0
+      "U": 339766.5,
+      "p": 6.3e-05
     },
     "WebMD_vs_News": {
-      "U": 24907.5,
-      "p": 0.000183
+      "U": 20994.0,
+      "p": 0.0
     }
   },
-  "cosine_similarity": 0.346,
-  "cosine_similarity_normalized": 0.35,
-  "public_n": 3348,
-  "media_n": 634,
-  "reddit_n": 3246,
+  "cosine_similarity": 0.446,
+  "cosine_similarity_normalized": 0.37,
+  "public_n": 1286,
+  "media_n": 647,
+  "reddit_n": 1184,
   "webmd_n": 102,
-  "news_n": 634,
+  "news_n": 647,
   "public_sentiment_dist": {
-    "positive": 1774,
-    "negative": 1267,
-    "neutral": 307
+    "positive": 662,
+    "negative": 501,
+    "neutral": 123
   },
   "media_sentiment_dist": {
-    "negative": 314,
-    "positive": 178,
-    "neutral": 142
+    "positive": 354,
+    "negative": 242,
+    "neutral": 51
   },
-  "nb_accuracy": 0.9759,
+  "nb_accuracy": 0.9783,
   "nb_best_alpha": 0.1,
-  "nb_accuracy_normalized": 0.9756,
-  "knn_accuracy": 0.9669,
-  "knn_best_k": 7,
-  "knn_accuracy_normalized": 0.9643,
-  "kmeans_purity": 0.841,
+  "nb_accuracy_normalized": 0.9757,
+  "knn_accuracy": 0.955,
+  "knn_best_k": 5,
+  "knn_accuracy_normalized": 0.971,
+  "kmeans_purity": 0.898,
   "top_public_features": [
-    "anyone",
-    "day",
     "lb",
-    "since",
-    "back",
     "anyone else",
-    "experience",
-    "feeling",
-    "lot",
-    "anything"
+    "lost lb",
+    "tomorrow",
+    "hello",
+    "anyone",
+    "first dose",
+    "thanksgiving",
+    "pic",
+    "guy"
   ],
   "top_media_features": [
+    "glp drug",
+    "agonist",
+    "cardiovascular",
     "cnn",
-    "healthline",
-    "obesity drug",
-    "medscape",
-    "nbc",
-    "cnbc",
-    "nbc news",
-    "healio",
-    "npr",
-    "kff"
+    "published",
+    "reuters",
+    "lilly",
+    "participant",
+    "demand",
+    "drug wegovy"
   ],
   "aspect_sentiment": {
     "media": {
-      "access": -0.3505741176470588,
-      "cost": -0.022739726027397256,
-      "dosage": -0.1504625,
-      "efficacy": -0.3279373333333333,
-      "food_relationship": -0.09325454545454544,
-      "mental_health": -0.7350333333333334,
-      "side_effects": -0.19756
+      "access": 0.2796580821917808,
+      "cost": 0.3594650485436893,
+      "dosage": 0.2966239898989899,
+      "efficacy": 0.23482377049180328,
+      "food_relationship": 0.3985149635036496,
+      "mental_health": 0.11193805309734513,
+      "side_effects": 0.13143788819875776
     },
     "public": {
-      "access": 0.20110875331564987,
-      "cost": 0.15921015228426397,
-      "dosage": 0.07677975460122699,
-      "efficacy": 0.13554295774647887,
-      "food_relationship": 0.12521325,
-      "mental_health": -0.10053687943262411,
-      "side_effects": -0.034444745762711865
+      "access": 0.1473948275862069,
+      "cost": 0.17288025477707006,
+      "dosage": 0.12148761904761904,
+      "efficacy": 0.17185960698689956,
+      "food_relationship": 0.13133492063492064,
+      "mental_health": 0.0694690909090909,
+      "side_effects": -0.04219515418502203
     },
     "discrepancy": {
-      "access": 0.5516828709627086,
-      "cost": 0.18194987831166123,
-      "dosage": 0.227242254601227,
-      "efficacy": 0.46348029107981215,
-      "food_relationship": 0.21846779545454542,
-      "mental_health": 0.6344964539007093,
-      "side_effects": 0.16311525423728815
+      "access": -0.1322632546055739,
+      "cost": -0.18658479376661927,
+      "dosage": -0.17513637085137088,
+      "efficacy": -0.06296416350490372,
+      "food_relationship": -0.267180042868729,
+      "mental_health": -0.04246896218825423,
+      "side_effects": -0.1736330423837798
     }
   },
   "aspect_stats": {
     "access": {
-      "U": 23754.5,
-      "p": 0.0,
-      "pub_n": 377,
-      "med_n": 85
+      "U": 16678.5,
+      "p": 0.000574,
+      "pub_n": 116,
+      "med_n": 365
     },
     "cost": {
-      "U": 16905.5,
-      "p": 0.017128,
-      "pub_n": 394,
-      "med_n": 73
+      "U": 17564.0,
+      "p": 1e-06,
+      "pub_n": 157,
+      "med_n": 309
     },
     "dosage": {
-      "U": 24754.0,
-      "p": 0.071229,
-      "pub_n": 1304,
-      "med_n": 32
+      "U": 79226.0,
+      "p": 0.0,
+      "pub_n": 525,
+      "med_n": 396
     },
     "efficacy": {
-      "U": 172967.5,
-      "p": 0.0,
-      "pub_n": 1136,
-      "med_n": 225
+      "U": 93165.5,
+      "p": 1e-05,
+      "pub_n": 458,
+      "med_n": 488
     },
     "food_relationship": {
-      "U": 5181.5,
-      "p": 0.311489,
-      "pub_n": 800,
-      "med_n": 11
+      "U": 28412.5,
+      "p": 0.0,
+      "pub_n": 315,
+      "med_n": 274
     },
     "mental_health": {
-      "U": 894.5,
-      "p": 0.040016,
-      "pub_n": 141,
-      "med_n": 9
+      "U": 2896.5,
+      "p": 0.476758,
+      "pub_n": 55,
+      "med_n": 113
     },
     "side_effects": {
-      "U": 3185.0,
-      "p": 0.666181,
-      "pub_n": 590,
-      "med_n": 10
+      "U": 15660.0,
+      "p": 0.016366,
+      "pub_n": 227,
+      "med_n": 161
     }
   },
-  "discrepancy_classifier_accuracy": 0.8365,
+  "discrepancy_classifier_accuracy": 0.7977,
   "discrepancy_classifier_coefficients": {
-    "has_access": -0.1089,
-    "has_cost": 0.0305,
-    "has_dosage": 2.2354,
-    "has_efficacy": -0.0387,
-    "has_food_relationship": 2.3886,
-    "has_mental_health": 0.843,
-    "has_side_effects": 2.1825,
-    "sentiment": 0.8903
+    "has_access": -2.035,
+    "has_cost": -0.9991,
+    "has_dosage": 0.3047,
+    "has_efficacy": -1.0616,
+    "has_food_relationship": -0.1116,
+    "has_mental_health": -1.0305,
+    "has_side_effects": 0.1144,
+    "sentiment": 0.0763
   },
   "granger_results": {
     "media_causes_public": {
-      "best_p": 0.370085,
+      "best_p": 0.76723,
       "significant": "False",
       "max_lag": 4
     },
     "public_causes_media": {
-      "best_p": 0.300074,
+      "best_p": 0.518258,
       "significant": "False",
       "max_lag": 4
     }
   },
-  "crosscorrelation_peak_lag": -7,
-  "crosscorrelation_peak_r": 0.3089,
-  "volume_correlation": 0.0646,
+  "crosscorrelation_peak_lag": -4,
+  "crosscorrelation_peak_r": -0.2763,
+  "volume_correlation": 0.1894,
   "side_effect_rates_per_1k_tokens": {
     "public": {
-      "nausea": 3.381243,
-      "vomiting": 0.816523,
-      "diarrhea": 1.224785,
-      "constipation": 1.161975,
-      "headache": 0.523412,
-      "fatigue": 0.554817,
-      "dizziness": 0.146555,
-      "bloating": 0.219833,
-      "hair loss": 0.282643,
-      "pancreatitis": 0.115151,
-      "gastroparesis": 0.083746,
-      "depression": 0.334984,
-      "anxiety": 0.690904,
-      "insomnia": 0.094214,
-      "sulfur burp": 0.209365
+      "nausea": 3.366455,
+      "vomiting": 0.787316,
+      "diarrhea": 1.140251,
+      "constipation": 1.058804,
+      "headache": 0.570125,
+      "fatigue": 0.434381,
+      "dizziness": 0.108595,
+      "bloating": 0.054298,
+      "hair loss": 0.434381,
+      "pancreatitis": 0.108595,
+      "gastroparesis": 0.081446,
+      "depression": 0.135744,
+      "anxiety": 0.787316,
+      "insomnia": 0.0,
+      "sulfur burp": 0.217191
     },
     "media": {
-      "nausea": 0.786658,
-      "vomiting": 0.471995,
+      "nausea": 0.409351,
+      "vomiting": 0.227417,
       "diarrhea": 0.0,
-      "constipation": 0.0,
+      "constipation": 0.045483,
       "headache": 0.0,
       "fatigue": 0.0,
       "dizziness": 0.0,
       "bloating": 0.0,
-      "hair loss": 0.157332,
+      "hair loss": 0.0,
       "pancreatitis": 0.0,
-      "gastroparesis": 0.314663,
-      "depression": 0.314663,
-      "anxiety": 0.157332,
+      "gastroparesis": 0.13645,
+      "depression": 0.227417,
+      "anxiety": 0.227417,
       "insomnia": 0.0,
       "sulfur burp": 0.0
     }
   },
   "side_effect_doc_prevalence": {
     "public": {
-      "nausea": 0.073775,
-      "vomiting": 0.020311,
-      "diarrhea": 0.026583,
-      "constipation": 0.027479,
-      "headache": 0.011649,
-      "fatigue": 0.012843,
-      "dizziness": 0.003584,
-      "bloating": 0.005675,
-      "hair loss": 0.005078,
-      "pancreatitis": 0.002389,
-      "gastroparesis": 0.002091,
-      "depression": 0.008363,
-      "anxiety": 0.01583,
-      "insomnia": 0.002091,
-      "sulfur burp": 0.005078
+      "nausea": 0.07776,
+      "vomiting": 0.01944,
+      "diarrhea": 0.024883,
+      "constipation": 0.027216,
+      "headache": 0.013997,
+      "fatigue": 0.010109,
+      "dizziness": 0.00311,
+      "bloating": 0.001555,
+      "hair loss": 0.007776,
+      "pancreatitis": 0.002333,
+      "gastroparesis": 0.002333,
+      "depression": 0.003888,
+      "anxiety": 0.018663,
+      "insomnia": 0.0,
+      "sulfur burp": 0.005443
     },
     "media": {
-      "nausea": 0.007886,
-      "vomiting": 0.004732,
+      "nausea": 0.009274,
+      "vomiting": 0.006182,
       "diarrhea": 0.0,
-      "constipation": 0.0,
+      "constipation": 0.001546,
       "headache": 0.0,
       "fatigue": 0.0,
       "dizziness": 0.0,
       "bloating": 0.0,
-      "hair loss": 0.001577,
+      "hair loss": 0.0,
       "pancreatitis": 0.0,
-      "gastroparesis": 0.003155,
-      "depression": 0.003155,
-      "anxiety": 0.001577,
+      "gastroparesis": 0.001546,
+      "depression": 0.006182,
+      "anxiety": 0.006182,
       "insomnia": 0.0,
       "sulfur burp": 0.0
     }

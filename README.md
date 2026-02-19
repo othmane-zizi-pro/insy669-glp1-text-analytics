@@ -51,6 +51,7 @@ That's it. When step 4 finishes you will see updated outputs in `data/`, `figure
 | Sentiment data | `data/public_with_sentiment.csv`, `data/media_with_sentiment.csv` | Documents with VADER scores |
 | Statistics JSON | `data/analysis_stats.json` | Every metric referenced in the report (sentiment means, p-values, accuracies, etc.) |
 | Report | `report/report.pdf`, `report/report.docx` | 2-page summary with figures and tables |
+| Report v2 | `report/report_v2.pdf`, `report/report_v2.tex` | Fresh-hybrid update based on the latest validated recollection snapshot |
 
 ---
 
@@ -90,6 +91,8 @@ That's it. When step 4 finishes you will see updated outputs in `data/`, `figure
     ├── report.tex                LaTeX source
     ├── report.pdf                Compiled PDF
     ├── report.docx               Word version
+    ├── report_v2.tex             LaTeX source (fresh hybrid update)
+    ├── report_v2.pdf             Compiled PDF (fresh hybrid update)
     └── generate_docx.py          Script that builds the DOCX
 ```
 
