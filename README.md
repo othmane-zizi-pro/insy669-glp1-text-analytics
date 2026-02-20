@@ -14,7 +14,7 @@
 
 ## What This Project Does
 
-Compares **public discourse** (Reddit posts + WebMD patient reviews) with **media discourse** (Google News articles) about GLP-1 weight-loss drugs during Jan–Nov 2024, using an 8-stage NLP/ML pipeline: sentiment analysis, word associations, TF-IDF comparison, supervised classification, topic modelling, aspect-based sentiment, side-effect gap analysis, and temporal lead-lag testing.
+Compares **public discourse** (Reddit posts + WebMD patient reviews) with **media discourse** (Google News articles) about GLP-1 weight-loss drugs during Jan–Nov 2024, using a 9-stage NLP/ML pipeline: sentiment analysis, word associations, TF-IDF comparison, supervised classification, **public subanalysis (Reddit vs WebMD)**, topic modelling, aspect-based sentiment, side-effect gap analysis, and temporal lead-lag testing.
 
 ---
 
@@ -46,12 +46,13 @@ That's it. When step 4 finishes you will see updated outputs in `data/`, `figure
 
 | Output | Location | Description |
 |--------|----------|-------------|
-| 27 figures | `figures/*.png` | Sentiment plots, TF-IDF charts, classification results, topic distributions, side-effect comparisons, temporal analysis |
+| 30 figures | `figures/*.png` | Sentiment plots, TF-IDF charts, classification results, topic distributions, side-effect comparisons, temporal analysis, and Reddit-vs-WebMD subanalysis visuals |
 | Processed data | `data/public_processed.csv`, `data/media_processed.csv` | Tokenised and cleaned corpora |
 | Sentiment data | `data/public_with_sentiment.csv`, `data/media_with_sentiment.csv` | Documents with VADER scores |
 | Statistics JSON | `data/analysis_stats.json` | Every metric referenced in the report (sentiment means, p-values, accuracies, etc.) |
 | Report | `report/report.pdf`, `report/report.docx` | 2-page summary with figures and tables |
 | Report v2 | `report/report_v2.pdf`, `report/report_v2.tex` | Fresh-hybrid update based on the latest validated recollection snapshot |
+| Report v3 | `report/report_v3.pdf`, `report/report_v3.tex` | Adds Reddit-vs-WebMD public subanalysis while preserving full pipeline coverage |
 
 ---
 
@@ -59,7 +60,7 @@ That's it. When step 4 finishes you will see updated outputs in `data/`, `figure
 
 ```
 ├── project_cli.py            ← CLI entrypoint (start here)
-├── run_all_analysis.py       ← 8-stage analysis pipeline
+├── run_all_analysis.py       ← 9-stage analysis pipeline
 ├── collect_real_data.py      ← Data collection (Reddit, WebMD, News)
 ├── analysis_utils.py         ← Shared utilities (date parsing, schema validation)
 ├── requirements.txt          ← Python dependencies
@@ -93,6 +94,8 @@ That's it. When step 4 finishes you will see updated outputs in `data/`, `figure
     ├── report.docx               Word version
     ├── report_v2.tex             LaTeX source (fresh hybrid update)
     ├── report_v2.pdf             Compiled PDF (fresh hybrid update)
+    ├── report_v3.tex             LaTeX source (public subanalysis update)
+    ├── report_v3.pdf             Compiled PDF (public subanalysis update)
     └── generate_docx.py          Script that builds the DOCX
 ```
 
@@ -119,9 +122,10 @@ The script `run_all_analysis.py` executes these stages sequentially (each corres
 | 3 | Associations | PMI for key terms, MDS document similarity | `pmi_*.png`, `mds_plot.png` |
 | 4 | Comparison | TF-IDF top terms, word clouds, cosine similarity, side-effect gap | `tfidf_comparison.png`, `wordclouds.png`, `side_effects.png` |
 | 5 | Classification | Naive Bayes + KNN with `StratifiedKFold` CV (leakage-safe) | `classification_comparison.png`, `knn_k_selection.png` |
-| 6 | Topic Modelling | LDA (5 topics/corpus), K-Means clustering | `topic_distributions.png`, `kmeans_selection.png` |
-| 7 | Aspect Sentiment | Sentiment across 7 health aspects, logistic regression | `aspect_sentiment_comparison.png`, `aspect_discrepancy.png` |
-| 8 | Temporal | Granger causality, cross-correlation, volume trends | `granger_results.png`, `crosscorrelation.png` |
+| 6 | Public Subanalysis | Reddit-vs-WebMD sentiment, lexical, and classification contrast | `reddit_webmd_sentiment_boxplot.png`, `reddit_webmd_tfidf_comparison.png`, `reddit_webmd_classification.png` |
+| 7 | Topic Modelling | LDA (5 topics/corpus), K-Means clustering | `topic_distributions.png`, `kmeans_selection.png` |
+| 8 | Aspect Sentiment | Sentiment across 7 health aspects, logistic regression | `aspect_sentiment_comparison.png`, `aspect_discrepancy.png` |
+| 9 | Temporal | Granger causality, cross-correlation, volume trends | `granger_results.png`, `crosscorrelation.png` |
 
 ### Hybrid Media-Text Mode
 
@@ -150,6 +154,7 @@ Every metric is computed on both full text and a 40-token-capped version (`clean
 | **Aspect discrepancy** | Strongest public-minus-media gaps: cost (-0.187), dosage (-0.175), side effects (-0.174) |
 | **No temporal causation** | Granger best p-values: media->public 0.7672, public->media 0.5183 (both non-significant) |
 | **Natural clustering** | K-Means (k=2) purity 89.8% without supervision |
+| **Within-public divergence** | Reddit vs WebMD sentiment differs (0.1479 vs -0.3077, p < 0.001), with high source separability (NB 92.22%, KNN 92.38%) |
 
 ---
 

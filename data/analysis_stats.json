@@ -1,6 +1,6 @@
 {
   "media_text_mode": "hybrid",
-  "media_body_min_tokens": 60,
+  "media_body_min_tokens": 80,
   "normalized_token_cap": 40,
   "media_docs_with_usable_body": 450,
   "media_body_coverage": 0.6955,
@@ -245,6 +245,106 @@
       "anxiety": 0.006182,
       "insomnia": 0.0,
       "sulfur burp": 0.0
+    }
+  },
+  "reddit_webmd_subanalysis": {
+    "reddit_n": 1184,
+    "webmd_n": 102,
+    "mean_sentiment_reddit": 0.1479,
+    "mean_sentiment_webmd": -0.3077,
+    "t_statistic": 6.885,
+    "p_value": 0.0,
+    "cohens_d": 0.702,
+    "cosine_similarity": 0.751,
+    "nb_accuracy": 0.9222,
+    "nb_best_alpha": 0.01,
+    "knn_accuracy": 0.9238,
+    "knn_best_k": 7,
+    "top_reddit_terms": [
+      "weight",
+      "week",
+      "ozempic",
+      "dose",
+      "month",
+      "anyone",
+      "day",
+      "wegovy",
+      "first",
+      "lb"
+    ],
+    "top_webmd_terms": [
+      "week",
+      "day",
+      "effect",
+      "side",
+      "weight",
+      "lb",
+      "lost",
+      "side effect",
+      "month",
+      "eat"
+    ],
+    "side_effect_doc_prevalence": {
+      "nausea": {
+        "reddit": 0.081081,
+        "webmd": 0.245098
+      },
+      "vomiting": {
+        "reddit": 0.023649,
+        "webmd": 0.068627
+      },
+      "diarrhea": {
+        "reddit": 0.029561,
+        "webmd": 0.088235
+      },
+      "constipation": {
+        "reddit": 0.027872,
+        "webmd": 0.166667
+      },
+      "headache": {
+        "reddit": 0.017736,
+        "webmd": 0.058824
+      },
+      "fatigue": {
+        "reddit": 0.012669,
+        "webmd": 0.04902
+      },
+      "dizziness": {
+        "reddit": 0.005068,
+        "webmd": 0.019608
+      },
+      "bloating": {
+        "reddit": 0.003378,
+        "webmd": 0.009804
+      },
+      "hair loss": {
+        "reddit": 0.008446,
+        "webmd": 0.0
+      },
+      "pancreatitis": {
+        "reddit": 0.003378,
+        "webmd": 0.009804
+      },
+      "gastroparesis": {
+        "reddit": 0.002534,
+        "webmd": 0.009804
+      },
+      "depression": {
+        "reddit": 0.009291,
+        "webmd": 0.019608
+      },
+      "anxiety": {
+        "reddit": 0.022804,
+        "webmd": 0.019608
+      },
+      "insomnia": {
+        "reddit": 0.003378,
+        "webmd": 0.0
+      },
+      "sulfur burp": {
+        "reddit": 0.005912,
+        "webmd": 0.009804
+      }
     }
   }
 }
