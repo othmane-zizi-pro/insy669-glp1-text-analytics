@@ -52,6 +52,7 @@ os.makedirs(FIG_DIR, exist_ok=True)
 plt.rcParams['figure.dpi'] = 150
 plt.rcParams['savefig.dpi'] = 150
 plt.rcParams['savefig.bbox'] = 'tight'
+GRID_N_JOBS = int(os.environ.get('GRID_N_JOBS', '1'))
 
 
 def build_parser():
@@ -756,7 +757,7 @@ nb_pipeline = Pipeline([
     ('classifier', MultinomialNB()),
 ])
 nb_params = {'classifier__alpha': [0.01, 0.1, 0.5, 1.0, 2.0]}
-nb_grid = GridSearchCV(nb_pipeline, nb_params, cv=cv, scoring='accuracy', n_jobs=-1)
+nb_grid = GridSearchCV(nb_pipeline, nb_params, cv=cv, scoring='accuracy', n_jobs=GRID_N_JOBS)
 nb_grid.fit(all_texts, y)
 nb_best = nb_grid.best_estimator_
 nb_score = nb_grid.best_score_
@@ -772,7 +773,7 @@ knn_grid = GridSearchCV(
     {'classifier__n_neighbors': k_candidates},
     cv=cv,
     scoring='accuracy',
-    n_jobs=-1,
+    n_jobs=GRID_N_JOBS,
 )
 knn_grid.fit(all_texts, y)
 
@@ -831,7 +832,7 @@ print(f"Top media-indicative features: {top_media_features}")
 # Length-normalized classification for confound robustness checks
 all_texts_norm = pd.concat([df_public['clean_norm40'], df_media['clean_norm40']])
 
-nb_grid_norm = GridSearchCV(nb_pipeline, nb_params, cv=cv, scoring='accuracy', n_jobs=-1)
+nb_grid_norm = GridSearchCV(nb_pipeline, nb_params, cv=cv, scoring='accuracy', n_jobs=GRID_N_JOBS)
 nb_grid_norm.fit(all_texts_norm, y)
 nb_score_norm = nb_grid_norm.best_score_
 
@@ -840,7 +841,7 @@ knn_grid_norm = GridSearchCV(
     {'classifier__n_neighbors': k_candidates},
     cv=cv,
     scoring='accuracy',
-    n_jobs=-1,
+    n_jobs=GRID_N_JOBS,
 )
 knn_grid_norm.fit(all_texts_norm, y)
 knn_best_score_norm = knn_grid_norm.best_score_
@@ -869,6 +870,216 @@ if nb_score_norm > 0.8 and knn_best_score_norm > 0.8:
     print("  Interpretation: key corpus separability remains robust under length normalization.")
 else:
     print("  Interpretation: conclusions are sensitive to text length normalization.")
+
+
+# =============================================================================
+# NOTEBOOK 06B: PUBLIC SUBANALYSIS (REDDIT VS WEBMD)
+# =============================================================================
+print("\n" + "=" * 60)
+print("NOTEBOOK 06B: PUBLIC SUBANALYSIS (REDDIT VS WEBMD)")
+print("=" * 60)
+
+df_reddit_public = df_public[df_public['source'] == 'reddit'].copy()
+df_webmd_public = df_public[df_public['source'] == 'webmd'].copy()
+
+reddit_webmd_stats = {
+    'reddit_n': int(len(df_reddit_public)),
+    'webmd_n': int(len(df_webmd_public)),
+    'mean_sentiment_reddit': None,
+    'mean_sentiment_webmd': None,
+    't_statistic': None,
+    'p_value': None,
+    'cohens_d': None,
+    'cosine_similarity': None,
+    'nb_accuracy': None,
+    'nb_best_alpha': None,
+    'knn_accuracy': None,
+    'knn_best_k': None,
+    'top_reddit_terms': [],
+    'top_webmd_terms': [],
+    'side_effect_doc_prevalence': {},
+}
+
+if len(df_reddit_public) >= 5 and len(df_webmd_public) >= 5:
+    # Sentiment comparison
+    reddit_sent = df_reddit_public['sentiment']
+    webmd_sent = df_webmd_public['sentiment']
+    rw_t_stat, rw_p_val = stats.ttest_ind(reddit_sent, webmd_sent, equal_var=False)
+    rw_cohens_d = (reddit_sent.mean() - webmd_sent.mean()) / np.sqrt(
+        (reddit_sent.std() ** 2 + webmd_sent.std() ** 2) / 2
+    )
+
+    print(f"Reddit mean sentiment: {reddit_sent.mean():.4f} (n={len(reddit_sent)})")
+    print(f"WebMD  mean sentiment: {webmd_sent.mean():.4f} (n={len(webmd_sent)})")
+    print(f"Reddit vs WebMD t-test: t={rw_t_stat:.3f}, p={rw_p_val:.6f}, d={rw_cohens_d:.3f}")
+
+    fig, ax = plt.subplots(figsize=(9, 6))
+    rw_data = [reddit_sent, webmd_sent]
+    rw_bp = ax.boxplot(rw_data, labels=['Reddit', 'WebMD'], patch_artist=True, widths=0.5)
+    rw_bp['boxes'][0].set_facecolor('#2196F3')
+    rw_bp['boxes'][1].set_facecolor('#4CAF50')
+    for box in rw_bp['boxes']:
+        box.set_alpha(0.75)
+    ax.axhline(0, color='gray', linestyle=':', alpha=0.5)
+    ax.set_ylabel('VADER Compound Score')
+    ax.set_title('Public Subanalysis: Reddit vs WebMD Sentiment', fontweight='bold')
+    ax.annotate(
+        f'p = {rw_p_val:.2e}',
+        xy=(1.5, max(reddit_sent.max(), webmd_sent.max())),
+        fontsize=11,
+        ha='center',
+        fontweight='bold',
+    )
+    plt.tight_layout()
+    plt.savefig(f'{FIG_DIR}/reddit_webmd_sentiment_boxplot.png')
+    plt.close()
+    print("Saved reddit_webmd_sentiment_boxplot.png")
+
+    # Lexical comparison (TF-IDF)
+    try:
+        tfidf_reddit = TfidfVectorizer(max_features=3000, ngram_range=(1, 2), min_df=5)
+        tfidf_webmd = TfidfVectorizer(max_features=3000, ngram_range=(1, 2), min_df=1)
+        reddit_matrix = tfidf_reddit.fit_transform(df_reddit_public['clean'])
+        webmd_matrix = tfidf_webmd.fit_transform(df_webmd_public['clean'])
+
+        reddit_means = np.array(reddit_matrix.mean(axis=0)).flatten()
+        webmd_means = np.array(webmd_matrix.mean(axis=0)).flatten()
+        reddit_top_idx = reddit_means.argsort()[-15:][::-1]
+        webmd_top_idx = webmd_means.argsort()[-15:][::-1]
+        reddit_terms = [(tfidf_reddit.get_feature_names_out()[i], reddit_means[i]) for i in reddit_top_idx]
+        webmd_terms = [(tfidf_webmd.get_feature_names_out()[i], webmd_means[i]) for i in webmd_top_idx]
+
+        print("Top Reddit TF-IDF terms:", [t[0] for t in reddit_terms[:8]])
+        print("Top WebMD TF-IDF terms:", [t[0] for t in webmd_terms[:8]])
+
+        fig, axes = plt.subplots(1, 2, figsize=(15, 7))
+        reddit_words, reddit_scores = zip(*reddit_terms)
+        webmd_words, webmd_scores = zip(*webmd_terms)
+        axes[0].barh(range(15), reddit_scores, color='#2196F3', alpha=0.85)
+        axes[0].set_yticks(range(15))
+        axes[0].set_yticklabels(reddit_words)
+        axes[0].invert_yaxis()
+        axes[0].set_title('Reddit: Top TF-IDF Terms', fontweight='bold')
+
+        axes[1].barh(range(15), webmd_scores, color='#4CAF50', alpha=0.85)
+        axes[1].set_yticks(range(15))
+        axes[1].set_yticklabels(webmd_words)
+        axes[1].invert_yaxis()
+        axes[1].set_title('WebMD: Top TF-IDF Terms', fontweight='bold')
+        plt.tight_layout()
+        plt.savefig(f'{FIG_DIR}/reddit_webmd_tfidf_comparison.png')
+        plt.close()
+        print("Saved reddit_webmd_tfidf_comparison.png")
+    except Exception as e:
+        reddit_terms = []
+        webmd_terms = []
+        print(f"[WARN] Reddit/WebMD TF-IDF comparison skipped: {e}")
+
+    # Cosine similarity in shared feature space
+    try:
+        tfidf_rw = TfidfVectorizer(max_features=4000, ngram_range=(1, 2), min_df=2)
+        rw_matrix = tfidf_rw.fit_transform(pd.concat([df_reddit_public['clean'], df_webmd_public['clean']]))
+        reddit_vec = np.asarray(rw_matrix[:len(df_reddit_public)].mean(axis=0))
+        webmd_vec = np.asarray(rw_matrix[len(df_reddit_public):].mean(axis=0))
+        rw_cosine = float(cosine_similarity(reddit_vec, webmd_vec)[0][0])
+        print(f"Reddit vs WebMD cosine similarity: {rw_cosine:.3f}")
+    except Exception as e:
+        rw_cosine = None
+        print(f"[WARN] Reddit/WebMD cosine similarity skipped: {e}")
+
+    # Classification (Reddit vs WebMD)
+    try:
+        rw_texts = pd.concat([df_reddit_public['clean'], df_webmd_public['clean']])
+        rw_labels = np.array(['reddit'] * len(df_reddit_public) + ['webmd'] * len(df_webmd_public))
+        rw_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+        nb_rw_pipeline = Pipeline([
+            ('vectorizer', TfidfVectorizer(max_features=3000, ngram_range=(1, 2), min_df=2)),
+            ('classifier', MultinomialNB()),
+        ])
+        nb_rw_params = {'classifier__alpha': [0.01, 0.1, 0.5, 1.0, 2.0]}
+        nb_rw_grid = GridSearchCV(
+            nb_rw_pipeline,
+            nb_rw_params,
+            cv=rw_cv,
+            scoring='accuracy',
+            n_jobs=GRID_N_JOBS,
+        )
+        nb_rw_grid.fit(rw_texts, rw_labels)
+        nb_rw_score = float(nb_rw_grid.best_score_)
+        nb_rw_alpha = float(nb_rw_grid.best_params_['classifier__alpha'])
+
+        knn_rw_pipeline = Pipeline([
+            ('vectorizer', TfidfVectorizer(max_features=3000, ngram_range=(1, 2), min_df=2)),
+            ('classifier', KNeighborsClassifier(metric='cosine')),
+        ])
+        k_rw_candidates = [3, 5, 7, 9, 11, 13, 15]
+        knn_rw_grid = GridSearchCV(
+            knn_rw_pipeline,
+            {'classifier__n_neighbors': k_rw_candidates},
+            cv=rw_cv,
+            scoring='accuracy',
+            n_jobs=GRID_N_JOBS,
+        )
+        knn_rw_grid.fit(rw_texts, rw_labels)
+        knn_rw_score = float(knn_rw_grid.best_score_)
+        knn_rw_k = int(knn_rw_grid.best_params_['classifier__n_neighbors'])
+
+        print(f"Reddit vs WebMD NB accuracy:  {nb_rw_score:.4f} (alpha={nb_rw_alpha})")
+        print(f"Reddit vs WebMD KNN accuracy: {knn_rw_score:.4f} (k={knn_rw_k})")
+
+        fig, ax = plt.subplots(figsize=(8, 5))
+        model_names = ['Naive Bayes', f'KNN (k={knn_rw_k})']
+        model_scores = [nb_rw_score, knn_rw_score]
+        bars = ax.bar(model_names, model_scores, color=['#2196F3', '#4CAF50'], alpha=0.85, width=0.5)
+        ax.set_ylim(0.4, 1.0)
+        ax.set_ylabel('Cross-Validation Accuracy')
+        ax.set_title('Public Subanalysis: Reddit vs WebMD Classification', fontweight='bold')
+        for bar, score in zip(bars, model_scores):
+            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.01,
+                    f'{score:.3f}', ha='center', fontsize=12, fontweight='bold')
+        plt.tight_layout()
+        plt.savefig(f'{FIG_DIR}/reddit_webmd_classification.png')
+        plt.close()
+        print("Saved reddit_webmd_classification.png")
+    except Exception as e:
+        nb_rw_score = None
+        nb_rw_alpha = None
+        knn_rw_score = None
+        knn_rw_k = None
+        print(f"[WARN] Reddit/WebMD classification skipped: {e}")
+
+    # Side-effect prevalence by public source
+    reddit_docs_lower = df_reddit_public['clean'].fillna('').str.lower()
+    webmd_docs_lower = df_webmd_public['clean'].fillna('').str.lower()
+    side_prev_rw = {}
+    for se in side_effects:
+        escaped = re.escape(se)
+        side_prev_rw[se] = {
+            'reddit': round(float(reddit_docs_lower.str.contains(escaped, regex=True).mean()), 6),
+            'webmd': round(float(webmd_docs_lower.str.contains(escaped, regex=True).mean()), 6),
+        }
+
+    reddit_webmd_stats.update({
+        'mean_sentiment_reddit': round(float(reddit_sent.mean()), 4),
+        'mean_sentiment_webmd': round(float(webmd_sent.mean()), 4),
+        't_statistic': round(float(rw_t_stat), 3),
+        'p_value': round(float(rw_p_val), 6),
+        'cohens_d': round(float(rw_cohens_d), 3),
+        'cosine_similarity': round(float(rw_cosine), 3) if rw_cosine is not None else None,
+        'nb_accuracy': round(float(nb_rw_score), 4) if nb_rw_score is not None else None,
+        'nb_best_alpha': nb_rw_alpha,
+        'knn_accuracy': round(float(knn_rw_score), 4) if knn_rw_score is not None else None,
+        'knn_best_k': knn_rw_k,
+        'top_reddit_terms': [t[0] for t in reddit_terms[:10]] if reddit_terms else [],
+        'top_webmd_terms': [t[0] for t in webmd_terms[:10]] if webmd_terms else [],
+        'side_effect_doc_prevalence': side_prev_rw,
+    })
+else:
+    print(
+        "Skipped Reddit/WebMD subanalysis due to insufficient samples: "
+        f"reddit={len(df_reddit_public)}, webmd={len(df_webmd_public)}"
+    )
 
 
 # =============================================================================
@@ -1382,6 +1593,7 @@ analysis_stats = {
         "public": side_effect_prev_public,
         "media": side_effect_prev_media,
     },
+    "reddit_webmd_subanalysis": reddit_webmd_stats,
 }
 
 with open(f'{DATA_DIR}/analysis_stats.json', 'w') as f:
