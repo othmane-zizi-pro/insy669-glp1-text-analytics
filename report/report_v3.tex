@@ -19,9 +19,13 @@
 \vspace{0.3em}
 INSY 669 - Text Analytics | McGill University | Winter 2026\\
 \vspace{0.6em}
-Vasilis Christopoulos (261278396) \hfill Hugo Guideau (261261108)\\
-Saksi Khosla (261284778) \hfill Othmane Zizi (261255341)\\
-Mustafa Yousuf (261265412)
+{\small
+Vasilis Christopoulos~(261278396)\\
+Hugo Guideau~(261261108)\\
+Saksi Khosla~(261284778)\\
+Othmane Zizi~(261255341)\\
+Mustafa Yousuf~(261265412)
+}
 \end{center}
 
 \section{Introduction}
@@ -46,15 +50,15 @@ Reddit / WebMD / News & 1,184 / 102 / 647 \\
 \end{table}
 
 \section{Methodology}
-\textbf{Collection strategy and data types.} Public data were collected from Reddit (community posts) and WebMD (patient reviews), while media data were collected from Google News RSS with GLP-1-specific queries and optional article-body expansion. This yields mixed text types that reflect real consumption contexts: short conversational posts (Reddit), semi-structured patient narratives (WebMD), and publisher-formatted news coverage.
+\textbf{Collection strategy and data types.} Public data were collected from Reddit (community posts) and WebMD (patient reviews), while media data were collected from Google News RSS using GLP-1 specific query terms and then expanded with article-body extraction. This yields mixed data types: short conversational posts, semi-structured patient reviews, and long-form news articles.
 
-\textbf{Information retrieval tools and rationale.} Reddit collection used Arctic Shift endpoints; WebMD used deterministic HTML scraping; media collection used RSS retrieval, Google link decoding, and bounded HTML body extraction. This stack was selected because it is reproducible with open tools (\texttt{requests}, \texttt{BeautifulSoup}), does not require proprietary access, and supports source traceability from raw collection to processed corpus.
+\textbf{Hybrid representation rationale.} Media text was processed with \texttt{media\_text\_mode=hybrid}, which prefers extracted article body text and falls back to RSS snippet text only when body text is unavailable. This representation is appropriate for balancing semantic richness and coverage across heterogeneous publishers. In the frozen run, usable body coverage is 0.696 and fallback ratio is 0.304 (197/647).
 
-\textbf{Text analytics methods and rationale.} Preprocessing used tokenization, lowercasing, stopword removal, and lemmatization to standardize cross-source language. VADER was used for sentiment because it is robust for short informal text and still interpretable on news prose. TF-IDF and Bag-of-Words were used for lexical comparison and features because they are transparent and suitable for domain terms. Supervised separability was tested with Multinomial Naive Bayes and KNN as complementary baselines (probabilistic linear vs distance-based). Topic structure used LDA and K-Means to triangulate latent themes and cluster separation. Aspect framing and temporal coupling were assessed to move beyond simple polarity into substantive narrative differences.
+\textbf{Information retrieval and preprocessing.} Retrieval combines API-style subreddit extraction, website scraping, RSS search aggregation, URL resolution, and HTML text extraction. Text preprocessing includes tokenization, lowercasing, punctuation and stopword filtering, and lemmatization. TF-IDF and Bag-of-Words feature spaces support comparison, classification, and clustering tasks.
 
-\textbf{Experimentation process (decision path).} The final configuration was chosen through explicit trial stages. First, we used snippet-only media text as a baseline for full corpus coverage and fast iteration. Second, we tested body-only media text to improve semantic depth, but coverage volatility made this representation brittle. Third, we compared \texttt{snippet}, \texttt{body}, and \texttt{hybrid} on the same frozen dataset and retained \texttt{hybrid} as the operating mode because it preserved body richness while controlling missing-body risk through fallback. For recollection, a strict run (timeout 15, min body tokens 80) failed representation gates, then a second run (timeout 25, min body tokens 60) passed and became the reporting snapshot.
+\textbf{Experimentation process.} The final analysis design came from staged trials rather than a single pass. We first ran snippet-based media text as the baseline to verify full coverage and stable end-to-end execution. We then tested body-only media text to increase semantic depth, but publisher-level extraction variability reduced representativeness. We therefore selected hybrid mode and finalized it after a strict run (timeout 15, minimum 80 tokens) failed coverage checks and a second run (timeout 25, minimum 60 tokens) passed the representation gates.
 
-\textbf{Hyperparameter tuning and robustness checks.} Classification used leakage-safe \texttt{Pipeline} + \texttt{StratifiedKFold} + \texttt{GridSearchCV}. Naive Bayes tuned $\alpha$ and KNN tuned neighborhood size $k$ inside cross-validation. Robustness was tested in two ways: (1) length-normalized reruns (token cap = 40) to reduce document-length confounding, and (2) a within-public Reddit-vs-WebMD subanalysis to verify that public discourse is itself heterogeneous rather than a single homogeneous class.
+\textbf{Hyperparameter tuning.} Classification used leakage-safe, cross-validated pipelines. Multinomial Naive Bayes tuned smoothing ($\alpha$) and KNN tuned neighborhood size ($k$) inside cross-validation. A robustness track repeated lexical and classification comparisons under token-length normalization (cap = 40 tokens) to test sensitivity to document length effects.
 
 \section{Results}
 \subsection{Sentiment Analysis}
@@ -116,10 +120,5 @@ A practical limitation is source heterogeneity: Reddit posts are shorter and con
 \newpage
 \section{Conclusion}
 Using recollected data and hybrid media representation, this analysis confirms persistent narrative divergence between public discourse and media framing on GLP-1 drugs. The conclusions are grounded in explicit representation quality gates, reproducible end-to-end execution, and leakage-safe modeling, and they remain directionally consistent across multiple analytical methods.
-
-\vfill
-\begin{center}
-\small Snapshot run ID: 20260218\_185202\_hybrid\_recollect
-\end{center}
 
 \end{document}
